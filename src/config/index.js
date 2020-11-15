@@ -2,7 +2,7 @@ export default {
   /**
    * @description 配置显示在浏览器标签的title
    */
-  title: 'JH-admin',
+  title: 'jh-admin',
   /**
    * @description token在Cookie中存储的天数，默认1天
    */
@@ -18,7 +18,7 @@ export default {
    */
   baseUrl: {
     dev: 'http://192.168.116.6:8000',
-    pro: 'http://124.71.164.63'
+    pro: 'https://www.jhadmin.xyz:8000'
   },
   /**
    * @description 默认打开的首页的路由name值，默认为home

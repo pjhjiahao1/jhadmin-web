@@ -14,3 +14,27 @@ export const listForPage = (params) => {
     method: 'get'
   })
 }
+
+export const save = (params) => {
+  return axios.request({
+    url: 'api/role',
+    params,
+    method: 'post'
+  })
+}
+
+export const update = (params) => {
+  return axios.request({
+    url: 'api/role',
+    params,
+    method: 'put'
+  })
+}
+
+export const remove = (params) => {
+  return axios.request({
+    url: 'api/role',
+    params,
+    method: 'delete'
+  })
+}

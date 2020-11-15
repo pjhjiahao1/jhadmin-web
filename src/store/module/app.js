@@ -119,7 +119,6 @@ export default {
       return new Promise((resolve, reject) => {
         try {
           buildMenus().then(res => {
-            debugger
             const asyncRouter = filterAsyncRouter(res.data.data)
             let route = filterUserRouter(asyncRouter)
             let emptyArr = []

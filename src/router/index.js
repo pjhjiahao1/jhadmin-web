@@ -15,13 +15,20 @@ const router = new Router({
 const LOGIN_PAGE_NAME = 'login'
 
 const turnTo = (to, access, next) => {
-  if(access.indexOf('admin') > -1){
-    next()
+  
+  if (to.name == null) {
+    next({
+      name: homeName // 跳转到homeName页
+    })
   } else {
-    if (canTurnTo(to.name, access, store.state.app.custom_router))
-      next() // 有权限，可访问
-    else 
-      next({ replace: true, name: 'error_401' }) // 无权限，重定向到401页面
+    if(access.indexOf('admin') > -1){
+      next()
+    } else {
+      if (canTurnTo(to.name, access, store.state.app.custom_router)) 
+        next() // 有权限，可访问
+      else 
+        next({ replace: true, name: 'error_401' }) // 无权限，重定向到401页面
+    }
   }
 }
 
@@ -53,6 +60,7 @@ const initRouters = (to, store, next) => {
         // 判断权限
         turnTo(to, store.state.user.access, next)
       }).finally(() => {
+
       })
     }
   }

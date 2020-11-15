@@ -2,20 +2,20 @@
   <div>
     <Card>
         <Row type="flex" justify="start" class="code-row-bg">
-           <Button type="success" icon="md-add" @click="adduser" >新增用户</Button>
+           <Button type="success" icon="md-add" @click="adduser" >新增</Button>
         </Row>
         <br>
         <tables ref="tables" pageInfo editable v-model="tableData" :columns="columns" :changePageCallback="changePageCallback" :total="total" :page-size="pageSize"
-            :current="page"/>
+            :current="page" />
     </Card>
     <Modal
         v-model="add"
         :title="title"
         :mask-closable="false"
-        :closable="false"
+        :closable="true"
         footer-hide
         width="500">
-        <Form ref="userForm" :model="user" :rules="ruleInline" inline :label-width="80">
+        <Form ref="userForm" :model="user" :rules="ruleInline" :label-width="80">
             <Row>
                 <i-col span="12">
                     <FormItem prop="username" label="用户名：" >
@@ -348,7 +348,6 @@ export default {
         });
     },
     statusChange (params,value,index) {
-        debugger
         let _this = this;
         this.$Modal.confirm({
         title: "确定" + (value == true?'激活':'禁用') +"该用户？",

@@ -2,8 +2,9 @@
   <div>
     <Card>
         <Row type="flex" justify="start" class="code-row-bg">
-          <Button type="success" icon="md-add" @click="adduser" >新增角色</Button>
+          <Button type="success" icon="md-add" @click="addrole" >新增</Button>
         </Row>
+        <br>
         <Row>
             <tables ref="tables" pageInfo editable v-model="tableData" :columns="columns" :changePageCallback="changePageCallback" :total="total" :page-size="pageSize"
               :current="page"/>
@@ -20,6 +21,50 @@
           <Tree ref="tree" :data="baseData" show-checkbox></Tree>
         </Card>
     </Modal>
+    <Modal
+        v-model="add"
+        :title="title"
+        :mask-closable="false"
+        :closable="true"
+        footer-hide
+        width="500">
+        <Form ref="roleForm" :model="role" :rules="ruleInline" :label-width="100">
+            <Row>
+                <i-col span="12">
+                    <FormItem prop="roleName" label="角色名称：" >
+                        <Input placeholder="请输入" v-model="role.roleName" :readonly= 'flag'/>
+                    </FormItem>
+                </i-col>
+                <i-col span="12">
+                    <FormItem prop="roleCode" label="角色编码：">
+                        <Input placeholder="请输入"  v-model="role.roleCode"/>
+                    </FormItem>
+                </i-col>
+            </Row>
+            <Row>
+                <i-col span="12">
+                    <FormItem prop="roleDesc" label="角色描述：">
+                        <Input placeholder="请输入" v-model="role.roleDesc"/>
+                    </FormItem>
+                </i-col>
+                <i-col span="12">
+                    <FormItem prop="sort" label="排序：" >
+                        <Input placeholder="请输入" v-model="role.sort"/>
+                    </FormItem>
+                </i-col>
+            </Row>
+            <Row type="flex" justify="end" class="code-row-bg">
+                <FormItem>
+                    <Button type="primary"
+                            @click="ok('userForm')"
+                            >确定</Button>
+                    <Button @click="add=false"
+                            style="margin-left: 8px">取消</Button>
+                </FormItem>
+            </Row>
+            
+        </Form>
+    </Modal>
   </div>
 </template>
 
@@ -27,8 +72,10 @@
 import Tables from '_c/tables'
 import { listForPage } from '@/api/system/role'
 import { buildTree } from '@/api/system/menu'
-import { save } from '@/api/system/roleMenu'
+import { saveRoleMenu } from '@/api/system/roleMenu'
+import { save, update, remove } from '@/api/system/role'
 import { Message } from 'iview'
+import { validateNumber } from "@/libs/validate"; // 正数验证
 export default {
   name: 'system_role',
   components: {
@@ -36,7 +83,6 @@ export default {
   },
   data () {
     return {
-        roleList: [], // 角色列表 - select用
         columns: [
             { title: '角色名称', key: 'roleName'},
             { title: '角色编码', key: 'roleCode' },
@@ -74,7 +120,7 @@ export default {
                         },
                         on: {
                             click: () => {
-                                // this.edit(params.row);
+                              this.edit(params.row);
                             }
                         }
                     })
@@ -128,7 +174,7 @@ export default {
                         },
                         on: {
                             click: () => {
-                                // this.delete(params.row);
+                                this.delete(params.row);
                             }
                         }
                     })
@@ -147,67 +193,53 @@ export default {
       roleName: '',
       roleCode: '',
       flag: false,
+      role: {
+        roleName: '',
+        roleCode: '',
+        roleDesc: '',
+        sort: 1
+      },
       ruleInline: {
-          username: [
+          roleName: [
           {
             required: true,
-            message: "请输入用户名",
+            message: "请输入角色名称",
             trigger: "change"
           },
-          { type: "string", max: 20, message: "账户名过长", trigger: "change" }
+          { type: "string", max: 20, message: "角色名称过长", trigger: "change" }
         ],
-        nickName: [
+        roleCode: [
           {
             required: true,
-            message: "请输入昵称",
+            message: "请输入角色编码",
             trigger: "change"
           },
-          { type: "string", max: 10, message: "昵称过长", trigger: "change" }
+          { type: "string", max: 10, message: "角色编码过长", trigger: "change" }
         ],
-        phone: [
+        roleDesc: [
+          {
+            required: true,
+            trigger: "change",
+            message: "请输入角色描述",
+          }
+        ],
+        sort: [
           {
             required: true,
             trigger: "change",
             validator: function(rule, value, callback) {
-                 
-              if (!validateTel(value)) {
-                callback(new Error("联系方式格式不正确"));
+              if (!validateNumber(value)) {
+                callback(new Error("排序格式不正确,输入正数"));
               } else {
                 callback();
               }
             }
-          }
-        ],
-        email: [
-          {
-            required: true,
-            trigger: "change",
-            validator: function(rule, value, callback) {
-              if (!validateEmail(value)) {
-                callback(new Error("邮箱格式不正确"));
-              } else {
-                callback();
-              }
-            }
-          }
-        ],
-        roleId: [
-          {
-            required: true,
-            validator: function(rule, value, callback) {
-              if (value === '') {
-                callback(new Error("请选择用户角色"));
-              } else {
-                callback();
-              }
-            },
-            message: "请选择用户角色",
-            trigger: "change"
           }
         ]
       },
       baseData: [],
-      roleId: ''
+      roleId: '',
+      title: ''
     }
   },
   async created() {
@@ -215,17 +247,20 @@ export default {
   methods: {
     // 菜单保存
     roleMenuOk () {
-      debugger
+      if (this.roleCode === 'admin') {
+        return Message.warning("暂不支持修改admin用户")
+      }
       let treeNode = this.$refs.tree.getCheckedNodes()
       const params = { 'roleid': this.roleId,'rolemenu': treeNode }
-      save(JSON.stringify(params)).then(res => {
-        debugger
+      saveRoleMenu(JSON.stringify(params)).then(res => {
+        Message.success(res.data.message);
       })
     },
     // 查看关联菜单
     relateMenus (row) {
       this.menuFlag = true
       this.roleId = row.id
+      this.roleCode = row.roleCode
       this.baseData = []
       this.buildTree(row.roleCode)
     },
@@ -233,7 +268,6 @@ export default {
     buildTree (roleCode) {
       const params = { rolecode: roleCode }
       buildTree(params).then(res => {
-        debugger
         this.baseData = res.data.data
       })
     },
@@ -250,25 +284,24 @@ export default {
         this.tableData = res.data.data.list
       })
     },
-    adduser () {
+    addrole () {
       this.add = true;
-      this.title = '新增用户'
-      this.flag = false
-      this.$refs.userForm.resetFields();
+      this.title = '新增角色'
+      this.$refs.roleForm.resetFields();
     },
     ok () {
-        this.$refs.userForm.validate(async valid => {
+        this.$refs.roleForm.validate(async valid => {
             if (valid) {
                 switch (this.title) {
-                    case '新增用户':
-                        save(this.user).then(res => {
+                    case '新增角色':
+                        save(this.role).then(res => {
                             Message.success(res.data.message);
                             this.add = false;
                             this.listForPage(this.page,this.pageSize);
                         })
                     break
-                    case '编辑用户':
-                        update(this.user).then(res => {
+                    case '编辑角色':
+                        update(this.role).then(res => {
                             Message.success(res.data.message);
                             this.add = false;
                             this.listForPage(this.page,this.pageSize);
@@ -280,14 +313,12 @@ export default {
     },
     edit (params) {
         this.add = true;
-        this.title = '编辑用户'
-        this.user = JSON.parse(JSON.stringify(params));
-        this.user.enabled = this.user.enabled + ''
-        this.flag = true
+        this.title = '编辑角色'
+        this.role = JSON.parse(JSON.stringify(params));
     },
     delete (params) {
         this.$Modal.confirm({
-            title: "确定删除该用户？",
+            title: "确定删除该角色？",
             onOk: async () => {
                 remove({id: params.id}).then(res => {
                     Message.success(res.data.message);
@@ -295,21 +326,6 @@ export default {
                 })
             },
             closable: true
-        });
-    },
-    statusChange (params,value,index) {
-        debugger
-        let _this = this;
-        this.$Modal.confirm({
-        title: "确定" + (value == true?'激活':'禁用') +"该用户？",
-            onOk: async () => {
-
-            },
-            onCancel: () => {
-                
-                _this.tableData[index].enabled = 1;
-                console.log(_this.tableData[index].enabled)
-            }
         });
     }
   },

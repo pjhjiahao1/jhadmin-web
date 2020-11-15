@@ -1,6 +1,6 @@
 import axios from '@/libs/api.request'
 
-export const save = (params) => {
+export const saveRoleMenu = (params) => {
     return axios.request({
       url: 'api/rolemenu',
       data: params,
