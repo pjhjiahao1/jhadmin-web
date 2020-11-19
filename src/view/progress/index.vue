@@ -20,7 +20,7 @@
                 <Checkbox v-model="complete" disabled>角色管理：对权限与菜单进行分配，可根据部门设置角色的数据权限</Checkbox>
             </Row>
             <Row>
-                <Checkbox v-model="unfinished" disabled>菜单管理：已实现菜单动态路由，后端可配置化，支持多级菜单</Checkbox>
+                <Checkbox v-model="complete" disabled>菜单管理：已实现菜单动态路由，后端可配置化，支持多级菜单</Checkbox>
             </Row>
             <Row>
                 <Checkbox v-model="unfinished" disabled>部门管理：可配置系统组织架构，树形表格展示</Checkbox>

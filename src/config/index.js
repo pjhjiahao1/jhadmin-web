@@ -18,7 +18,7 @@ export default {
    */
   baseUrl: {
     dev: 'http://192.168.116.6:8000',
-    pro: 'https://www.jhadmin.xyz:8000'
+    pro: ''
   },
   /**
    * @description 默认打开的首页的路由name值，默认为home

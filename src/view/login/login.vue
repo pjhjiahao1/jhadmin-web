@@ -47,7 +47,11 @@
         
       </FormItem>
       <FormItem>
-        <Button @click="handleSubmit" type="primary" long>登录</Button>
+        <!-- <Button @click="handleSubmit" type="primary" long>登录</Button> -->
+        <Button type="primary" :loading="loading" @click="handleSubmit" long>
+          <span v-if="!loading">登录</span>
+          <span v-else>登陆中...</span>
+      </Button>
       </FormItem>
     </Form>
   </div>
@@ -94,7 +98,8 @@ export default {
         uuid: '',
         rememberMe: false
       },
-      cookiePass: ''
+      cookiePass: '',
+      loading: false,
     }
   },
   computed: {
@@ -115,6 +120,7 @@ export default {
     handleSubmit () {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
+          this.loading = true
           let userName = this.form.userName
           let password = this.form.password
           let captcode = this.form.captcode

@@ -15,7 +15,12 @@ const resolve = dir => {
 // const BASE_URL = process.env.NODE_ENV === 'production'
 //   ? '/'
 //   : '/'
-const BASE_URL = './'
+const BASE_URL = process.env.NODE_ENV === 'production'
+  ? '/'
+  : '/'
+// const BASE_URL = process.env.NODE_ENV === 'production'
+//   ? 'https://www.jhadmin.xyz/'
+//   : '/'
 module.exports = {
   // Project deployment base
   // By default we assume your app will be deployed at the root of a domain,
@@ -35,9 +40,28 @@ module.exports = {
       .set('_c', resolve('src/components'))
   },
   // 设为false打包时不生成.map文件
-  productionSourceMap: false
+  productionSourceMap: false,
   // 这里写你调用接口的基础路径，来解决跨域，如果设置了代理，那你本地开发环境的axios的baseUrl要写为 '' ，即空字符串
-  // devServer: {
-  //   proxy: 'localhost:3000'
-  // }
+  devServer: {
+    proxy:{
+        '/auth':{
+            target: 'https://www.jhadmin.xyz:8000',//代理地址，这里设置的地址会代替axios中设置的baseURL
+            changeOrigin: true,// 如果接口跨域，需要进行这个参数配置
+            pathRewrite: {
+                '^/auth': '/auth' 
+                //pathRewrite: {'^/api': '/'} 重写之后url为 http://192.168.1.16:8085/xxxx
+                //pathRewrite: {'^/api': '/api'} 重写之后url为 http://192.168.1.16:8085/api/xxxx
+           }
+        },
+        '/api':{
+          target: 'https://www.jhadmin.xyz:8000',//代理地址，这里设置的地址会代替axios中设置的baseURL
+          changeOrigin: true,// 如果接口跨域，需要进行这个参数配置
+          pathRewrite: {
+              '^/api': '/api' 
+              //pathRewrite: {'^/api': '/'} 重写之后url为 http://192.168.1.16:8085/xxxx
+              //pathRewrite: {'^/api': '/api'} 重写之后url为 http://192.168.1.16:8085/api/xxxx
+         }
+        }
+    }
+  }
 }

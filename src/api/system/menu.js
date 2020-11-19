@@ -19,3 +19,34 @@ export const list = () => {
     method: 'get'
   })
 }
+
+export const firstMenu = () => {
+  return axios.request({
+    url: 'api/menus/firstMenu',
+    method: 'get'
+  })
+}
+
+export const save = (params) => {
+  return axios.request({
+    url: 'api/menus',
+    params,
+    method: 'post'
+  })
+}
+
+export const update = (params) => {
+  return axios.request({
+    url: 'api/menus',
+    params,
+    method: 'put'
+  })
+}
+
+export const remove = (params) => {
+  return axios.request({
+    url: 'api/menus',
+    params,
+    method: 'delete'
+  })
+}

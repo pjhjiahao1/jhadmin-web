@@ -174,7 +174,7 @@ export default {
                         },
                         on: {
                             click: () => {
-                                this.delete(params.row);
+                                this.remove(params.row);
                             }
                         }
                     })
@@ -316,7 +316,7 @@ export default {
         this.title = '编辑角色'
         this.role = JSON.parse(JSON.stringify(params));
     },
-    delete (params) {
+    remove (params) {
         this.$Modal.confirm({
             title: "确定删除该角色？",
             onOk: async () => {
