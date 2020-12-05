@@ -69,7 +69,7 @@
           </i-col>
         </Row>
         <Row>
-          <FormItem prop="roleId" label="角色：">
+          <FormItem label="角色：">
             <Select v-model="user.roleId" :max-tag-count="3" style="width: 380px">
               <Option v-for="(role,i) in roleList" :value="role.id" :key="i">{{ role.roleName }}</Option>
             </Select>

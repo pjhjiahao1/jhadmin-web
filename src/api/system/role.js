@@ -34,7 +34,7 @@ export const update = (params) => {
 export const remove = (params) => {
   return axios.request({
     url: 'api/role',
-    params,
+    data: params,
     method: 'delete'
   })
 }
