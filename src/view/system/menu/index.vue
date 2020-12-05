@@ -69,9 +69,9 @@
                 </i-col>
             </Row>
             <Row>
-                <i-col span="12" v-if="showCol == true" >
+                <i-col span="12">
                     <FormItem label="组件名称：" prop="menuCode">
-                        <Input placeholder="匹配前端页面name属性: ststem_dept" v-model="menu.menuCode"/>
+                        <Input placeholder="页面name: system_dept;目录：system" v-model="menu.menuCode"/>
                     </FormItem>
                 </i-col>
                  <i-col span="12" v-if="showCol == true" >
@@ -103,7 +103,7 @@
 import { list,firstMenu,save,update,remove } from '@/api/system/menu'
 import IconChoose from "@/components/icons-choose/icon-choose"
 import { validateNumber } from "@/libs/validate"; // 正数验证
-import { Message } from 'iview'
+import { Notice } from 'iview'
 export default {
   components: {
     IconChoose
@@ -231,15 +231,21 @@ export default {
         this.$refs.menuForm.resetFields()
     },
     remove (scope) {
-        debugger
         if (scope.row.isLeaf == 0 && scope.row.children.length > 0) {
-            return Message.warning("该目录下存在子菜单！")
+            Notice.warning({
+                title: '消息通知',
+                desc: "该目录下存在子菜单！"
+            });
+            return
         }
         this.$Modal.confirm({
             title: "确定删除该菜单？",
             onOk: async () => {
                 remove({id: scope.row.id}).then(res => {
-                    Message.success(res.data.message);
+                    Notice.success({
+                        title: '消息通知',
+                        desc: res.data.msg
+                    });
                     this.listForPage();
                 })
             },
@@ -268,14 +274,20 @@ export default {
                 switch (this.title) {
                     case '新增菜单':
                         save(this.menu).then(res => {
-                            Message.success(res.data.message);
+                            Notice.success({
+                                title: '消息通知',
+                                desc: res.data.msg
+                            });
                             this.show = false;
                             this.listForPage();
                         })
                     break
                     case '编辑菜单':
                         update(this.menu).then(res => {
-                            Message.success(res.data.message);
+                            Notice.success({
+                                title: '消息通知',
+                                desc: res.data.msg
+                            });
                             this.show = false;
                             this.listForPage();
                         })

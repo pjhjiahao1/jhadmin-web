@@ -1,230 +1,296 @@
 <template>
   <div>
     <Card>
-        <Row type="flex" justify="start" class="code-row-bg">
-           <Button type="success" icon="md-add" @click="adduser" >新增</Button>
-        </Row>
-        <br>
-        <tables ref="tables" pageInfo editable v-model="tableData" :columns="columns" :changePageCallback="changePageCallback" :total="total" :page-size="pageSize"
-            :current="page" />
+      <vxe-grid ref="xGrid" v-bind="gridOptions" :toolbar-config="tableToolbar">
+        <template v-slot:toolbar_buttons>
+          <vxe-button status="primary" @click="add">新增</vxe-button>
+          <vxe-button status="primary" @click="edit">编辑</vxe-button>
+          <vxe-button status="danger" @click="remove">删除</vxe-button>
+        </template>
+      </vxe-grid>
     </Card>
     <Modal
-        v-model="add"
-        :title="title"
-        :mask-closable="false"
-        :closable="true"
-        footer-hide
-        width="500">
-        <Form ref="userForm" :model="user" :rules="ruleInline" :label-width="80">
-            <Row>
-                <i-col span="12">
-                    <FormItem prop="username" label="用户名：" >
-                        <Input placeholder="请输入" v-model="user.username" :readonly= 'flag'/>
-                    </FormItem>
-                </i-col>
-                <i-col span="12">
-                    <FormItem prop="phone" label="手机号：">
-                        <Input placeholder="请输入"  v-model="user.phone"/>
-                    </FormItem>
-                </i-col>
-            </Row>
-            <Row>
-                <i-col span="12">
-                    <FormItem prop="nickName" label="昵称：">
-                        <Input placeholder="请输入" v-model="user.nickName"/>
-                    </FormItem>
-                </i-col>
-                <i-col span="12">
-                    <FormItem prop="email" label="邮箱：" >
-                        <Input placeholder="请输入" v-model="user.email"/>
-                    </FormItem>
-                </i-col>
-            </Row>
-            <Row>
-                <i-col span="12">
-                    <FormItem label="性别：">
-                        <RadioGroup v-model="user.gender">
-                            <Radio label="男">
-                                <span>男</span>
-                            </Radio>
-                            <Radio label="女">
-                                <span>女</span>
-                            </Radio>
-                        </RadioGroup>
-                    </FormItem>
-                </i-col>
-                <i-col span="12">
-                    <FormItem label="状态：">
-                        <RadioGroup v-model="user.enabled">
-                            <Radio label='1'>
-                                <span>激活</span>
-                            </Radio>
-                            <Radio label='0'>
-                                <span>禁用</span>
-                            </Radio>
-                        </RadioGroup>
-                    </FormItem>
-                </i-col>
-            </Row>
-            <Row>
-                <FormItem prop="roleId" label="角色：">
-                    <Select v-model="user.roleId" :max-tag-count="3" style="width: 380px">
-                        <Option v-for="(role,i) in roleList" :value="role.id" :key="i">
-                            {{ role.roleName }}
-                        </Option>
-                    </Select>
-                </FormItem>
-            </Row>
-            <Row type="flex" justify="end" class="code-row-bg">
-                <FormItem>
-                    <Button type="primary"
-                            @click="ok('userForm')"
-                            >确定</Button>
-                    <Button @click="add=false"
-                            style="margin-left: 8px">取消</Button>
-                </FormItem>
-            </Row>
-            
-        </Form>
+      v-model="modelflag"
+      :title="title"
+      :mask-closable="false"
+      :closable="true"
+      footer-hide
+      width="500"
+    >
+      <Form ref="userForm" :model="user" :rules="ruleInline" :label-width="80">
+        <Row>
+          <i-col span="12">
+            <FormItem prop="username" label="用户名：">
+              <Input placeholder="请输入" v-model="user.username" :readonly="usernameflag" />
+            </FormItem>
+          </i-col>
+          <i-col span="12">
+            <FormItem prop="phone" label="手机号：">
+              <Input placeholder="请输入" v-model="user.phone" />
+            </FormItem>
+          </i-col>
+        </Row>
+        <Row>
+          <i-col span="12">
+            <FormItem prop="nickName" label="昵称：">
+              <Input placeholder="请输入" v-model="user.nickName" />
+            </FormItem>
+          </i-col>
+          <i-col span="12">
+            <FormItem prop="email" label="邮箱：">
+              <Input placeholder="请输入" v-model="user.email" />
+            </FormItem>
+          </i-col>
+        </Row>
+        <Row>
+          <i-col span="12">
+            <FormItem label="性别：">
+              <RadioGroup v-model="user.gender">
+                <Radio label="男">
+                  <span>男</span>
+                </Radio>
+                <Radio label="女">
+                  <span>女</span>
+                </Radio>
+              </RadioGroup>
+            </FormItem>
+          </i-col>
+          <i-col span="12">
+            <FormItem label="状态：">
+              <RadioGroup v-model="user.enabled">
+                <Radio label="1">
+                  <span>激活</span>
+                </Radio>
+                <Radio label="0">
+                  <span>禁用</span>
+                </Radio>
+              </RadioGroup>
+            </FormItem>
+          </i-col>
+        </Row>
+        <Row>
+          <FormItem prop="roleId" label="角色：">
+            <Select v-model="user.roleId" :max-tag-count="3" style="width: 380px">
+              <Option v-for="(role,i) in roleList" :value="role.id" :key="i">{{ role.roleName }}</Option>
+            </Select>
+          </FormItem>
+        </Row>
+        <Row type="flex" justify="end" class="code-row-bg">
+          <FormItem>
+            <Button type="primary" @click="confirm('userForm')">确定</Button>
+            <Button @click="modelflag=false" style="margin-left: 8px">取消</Button>
+          </FormItem>
+        </Row>
+      </Form>
     </Modal>
   </div>
 </template>
 
 <script>
-import Tables from '_c/tables'
-import { listForPage, save, update, remove } from '@/api/system/user'
-import { getAllRole } from '@/api/system/role'
+// api 地址 https://xuliangzhan_admin.gitee.io/vxe-table/#/table/api
+import { listForPage, save, update, remove } from "@/api/system/user";
+import { getAllRole } from "@/api/system/role";
 import { validateTel, validateEmail } from "@/libs/validate"; // 手机号验证
-import { Message } from 'iview'
+import { Notice } from "iview";
 export default {
-  name: 'system_user',
-  components: {
-    Tables
-  },
-  data () {
+  name: "system_user",
+  components: {},
+  data() {
     return {
-        roleList: [], // 角色列表 - select用
-        columns: [
-            { title: '用户名', key: 'username'},
-            { title: '昵称', key: 'nickName' },
-            { title: "角色", key: "roleName" },
-            { title: '性别', key: 'gender' },
-            // { title: '是否启用', key: 'enabled'},
-            {
-                title: "状态",
-                key: "enabled",
-                // fixed: "right",
-                minWidth: 180,
-                align: "center",
-                render: (h, params) => {
-                return h("i-switch", {
-                    props: {
-                        type: 'primary',
-                        size: 'large',
-                        disabled: true,
-                        value: Number(params.row.enabled) === 1 //控制开关的打开或关闭状态，官网文档属性是value
-                    },
-                    scopedSlots: {
-                        open: () => h('span','正常'),
-                        close: () => h('span','禁止')
-                    },
-                    on: {
-                        'on-change': (value) => {//触发事件是on-change,用双引号括起来，
-                            //参数value是回调值，并没有使用到
-                            this.statusChange(params.row,value,params.index) //params.index是拿到table的行序列，可以取到对应的表格值
-                        }
-                    }
-                });
-            }
-        },
-            { title: '手机号', key: 'phone' },
-            { title: '邮箱', key: 'email' },
-            { title: '创建日期', key: 'createTime', sortable: true },
-            {
-                title: "操作",
-                key: "action",
-                fixed: "right",
-                minWidth: 180,
-                align: "center",
-                render: (h, params) => {
-                return h("div", [
-                h(
-                    "Tooltip",
-                    {
-                    props: {
-                        trigger: "hover",
-                        content: "修改",
-                        placement: "top",
-                        transfer: true
-                    }
-                    },
-                    [
-                    h("Button", {
-                        props: {
-                        type: "info",
-                        size: "small",
-                        icon: "ios-create-outline",
-                        disabled: params.row.username === "admin"
-                        },
-                        style: {
-                            marginRight: "5px"
-                        },
-                        on: {
-                            click: () => {
-                                this.edit(params.row);
-                            }
-                        }
-                    })
-                    ]
-                ),
-                h(
-                    "Tooltip",
-                    {
-                    props: {
-                        trigger: "hover",
-                        content: "删除",
-                        placement: "top",
-                        transfer: true
-                    }
-                    },
-                    [
-                    h("Button", {
-                        props: {
-                        type: "error",
-                        size: "small",
-                        icon: "ios-trash",
-                        disabled: params.row.username === "admin"
-                        },
-                        on: {
-                            click: () => {
-                                this.delete(params.row);
-                            }
-                        }
-                    })
-                    ]
-                )
-                ]);
-            }
+      tableToolbar: {
+        // 工具栏
+        refresh: true,
+        export: true,
+        custom: true,
+        slots: {
+          buttons: "toolbar_buttons"
         }
-      ],
-      tableData: [],
-      total: 0, // 条数
-      page: 1, // 当前页
-      pageSize: 10, // 显示条数
-      add: false,
-      title: '',
-      user: {
-          gender: '男',
-          enabled: '1',
-          username: '',
-          nickName: '',
-          phone: '',
-          email: '',
-          roleId: '',
       },
-      flag: false,
+      gridOptions: {
+        // 表格配置
+        border: true, // 是否带有边框
+        resizable: true, // 所有的列是否允许拖动列宽调整大小
+        showHeaderOverflow: true, // 设置表头所有内容过长时显示为省略号
+        showOverflow: true, // 设置所有内容过长时显示为省略号（如果是固定列建议设置该值，提升渲染速度）
+        highlightHoverRow: true, // 鼠标移到行是否要高亮显示
+        keepSource: true, // 保持原始值的状态，被某些功能所依赖，比如编辑状态、还原数据等（开启后影响性能，具体取决于数据量）
+        id: "user", // 唯一标识（被某些特定的功能所依赖）
+        height: document.documentElement.clientHeight - 150,
+        rowId: "id", // 自定义行数据唯一主键的字段名（行数据必须要有唯一主键，默认自动生成）
+        customConfig: {
+          // 自定义列配置项
+          storage: true, // 是否启用 localStorage 本地保存，会将列操作状态保留在本地（需要有 id）
+          checkMethod: this.checkColumnMethod // 自定义列是否允许列选中的方法，该方法 Function({ column }) 的返回值用来决定这一列的 checkbox 是否可以选中
+        },
+        sortConfig: {
+          // 排序配置项
+          trigger: "cell" // default（点击按钮触发）, cell（点击表头触发）
+        },
+        pagerConfig: {
+          pageSize: 10,
+          pageSizes: [5, 20, 50, 100, 500, 1000]
+        },
+        formConfig: {
+          titleWidth: 100,
+          titleAlign: "right",
+          items: [
+            {
+              field: "username",
+              title: "用户名",
+              span: 8,
+              itemRender: {
+                name: "$input",
+                props: { placeholder: "请输入名称" }
+              }
+            },
+            {
+              field: "nickName",
+              title: "昵称",
+              span: 8,
+              itemRender: {
+                name: "$input",
+                props: { placeholder: "请输入邮件" }
+              }
+            },
+            {
+              field: "roleName",
+              title: "角色",
+              span: 8,
+              itemRender: {
+                name: "$input",
+                props: { placeholder: "请输入昵称" }
+              }
+            },
+            {
+              field: "gender",
+              title: "性别",
+              span: 8,
+              folding: true,
+              itemRender: {
+                name: "$input",
+                props: { placeholder: "请输入角色" }
+              }
+            },
+            {
+              field: "enabled",
+              title: "状态",
+              span: 8,
+              folding: true,
+              itemRender: {
+                name: "$input",
+                props: { placeholder: "请输入角色" }
+              }
+            },
+            {
+              field: "phone",
+              title: "手机号",
+              span: 8,
+              folding: true,
+              itemRender: {
+                name: "$input",
+                props: { placeholder: "请输入年龄" }
+              }
+            },
+            {
+              field: "email",
+              title: "邮箱",
+              span: 8,
+              folding: true,
+              itemRender: {
+                name: "$input",
+                props: { placeholder: "请输入年龄" }
+              }
+            },
+            {
+              field: "createTime",
+              title: "创建日期",
+              span: 8,
+              folding: true,
+              itemRender: {
+                name: "$input",
+                props: { placeholder: "请输入年龄" }
+              }
+            },
+            {
+              span: 24,
+              align: "center",
+              collapseNode: true,
+              itemRender: {
+                name: "$buttons",
+                children: [
+                  {
+                    props: {
+                      type: "submit",
+                      content: "查询",
+                      status: "primary"
+                    }
+                  },
+                  { props: { type: "reset", content: "重置" } }
+                ]
+              }
+            }
+          ]
+        },
+        proxyConfig: {
+          seq: true, // 启用动态序号代理
+          form: true, // 启用表单代理
+          props: {
+            result: "result",
+            total: "page.total"
+          },
+          ajax: {
+            // 接收 Promise 对象
+            query: ({ page, form }) => {
+              // // 处理排序条件
+              const queryParams = Object.assign(
+                {
+                  pageSize: page.pageSize,
+                  currentPage: page.currentPage
+                },
+                form
+              );
+              return this.list(queryParams); //XEAjax.get(`https://api.xuliangzhan.com:10443/api/pub/page/list/${page.pageSize}/${page.currentPage}`, queryParams)
+            }
+          }
+        },
+        columns: [
+          { type: "checkbox", width: 40 },
+          { type: "seq", title: "序号", width: 50 },
+          { field: "username", title: "用户名", sortable: true },
+          { field: "nickName", title: "昵称", sortable: true },
+          { field: "roleName", title: "角色", sortable: true },
+          { field: "gender", title: "性别", sortable: true },
+          {
+            field: "enabled",
+            title: "状态",
+            sortable: true,
+            formatter: function({ cellValue }) {
+              if (cellValue == 1) {
+                return "启用";
+              } else {
+                return "禁用";
+              }
+            }
+          },
+          { field: "phone", title: "手机号", sortable: true },
+          { field: "email", title: "邮箱", sortable: true },
+          { field: "createTime", title: "创建日期", sortable: true }
+        ],
+        exportConfig: {
+          remote: true,
+          exportMethod: this.exportMethod,
+          types: ["xlsx"],
+          modes: ["current", "selected", "all"]
+        },
+        checkboxConfig: {
+          reserve: true,
+          highlight: true,
+          range: true
+        }
+      },
       ruleInline: {
-          username: [
+        // modal必填校验
+        username: [
           {
             required: true,
             message: "请输入用户名",
@@ -245,7 +311,6 @@ export default {
             required: true,
             trigger: "change",
             validator: function(rule, value, callback) {
-                 
               if (!validateTel(value)) {
                 callback(new Error("联系方式格式不正确"));
               } else {
@@ -271,7 +336,7 @@ export default {
           {
             required: true,
             validator: function(rule, value, callback) {
-              if (value === '') {
+              if (value === "") {
                 callback(new Error("请选择用户角色"));
               } else {
                 callback();
@@ -281,93 +346,127 @@ export default {
             trigger: "change"
           }
         ]
+      },
+      modelflag: false, // modal标识
+      title: "", // modal标识标题
+      usernameflag: false,
+      roleList: [], // 角色列表 - 下拉
+      user: {
+        gender: "男",
+        enabled: "1",
+        username: "",
+        nickName: "",
+        phone: "",
+        email: "",
+        roleId: ""
       }
-    }
+    };
   },
   async created() {
-      this.roleList = (await getAllRole()).data.data || []; // 角色列表下拉select框
-    //   console.log(this.roleList)
+    this.roleList = (await getAllRole()).data.data || []; // 角色列表下拉select框
   },
   methods: {
-    changePageCallback (page, pageSize) {
-        this.page = page
-        this.listForPage(page,pageSize)
-    },
-    listForPage (page,pageSize) {
-        const params = { pageNum: page, pageSize: pageSize}
-        listForPage(params).then(res => {
-            this.total = Number(res.data.data.total)
-            this.tableData = res.data.data.list
-        })
-    },
-    adduser () {
-        this.add = true;
-        this.title = '新增用户'
-        this.flag = false
-        this.$refs.userForm.resetFields();
-    },
-    ok () {
-        this.$refs.userForm.validate(async valid => {
-            if (valid) {
-                switch (this.title) {
-                    case '新增用户':
-                        save(this.user).then(res => {
-                            Message.success(res.data.message);
-                            this.add = false;
-                            this.listForPage(this.page,this.pageSize);
-                        })
-                    break
-                    case '编辑用户':
-                        update(this.user).then(res => {
-                            Message.success(res.data.message);
-                            this.add = false;
-                            this.listForPage(this.page,this.pageSize);
-                        })
-                    break
-                }
-            }
-        })   
-    },
-    edit (params) {
-        this.add = true;
-        this.title = '编辑用户'
-        this.user = JSON.parse(JSON.stringify(params));
-        this.user.enabled = this.user.enabled + ''
-        this.flag = true
-    },
-    delete (params) {
-        this.$Modal.confirm({
-            title: "确定删除该用户？",
-            onOk: async () => {
-                remove({id: params.id}).then(res => {
-                    Message.success(res.data.message);
-                    this.listForPage(this.page,this.pageSize);
-                })
-            },
-            closable: true
+    list(queryParams) {
+      return new Promise(resolve => {
+        listForPage(queryParams).then(res => {
+          resolve({
+            result: res.data.data.list,
+            page: { total: Number(res.data.data.total) }
+          });
         });
+      });
     },
-    statusChange (params,value,index) {
-        let _this = this;
-        this.$Modal.confirm({
-        title: "确定" + (value == true?'激活':'禁用') +"该用户？",
-            onOk: async () => {
-
-            },
-            onCancel: () => {
-                
-                _this.tableData[index].enabled = 1;
-                console.log(_this.tableData[index].enabled)
-            }
+    add() {
+      this.modelflag = true;
+      this.title = "新增用户";
+      this.usernameflag = false;
+      this.$refs.userForm.resetFields();
+    },
+    edit() {
+      // 获取选中数据
+      let selectRecords = this.$refs.xGrid.getCheckboxRecords();
+      if (selectRecords.length == 0) {
+        Notice.warning({
+          title: "消息通知",
+          desc: "请选择数据!"
         });
+        return;
+      } else if (selectRecords.length > 1) {
+        Notice.warning({
+          title: "消息通知",
+          desc: "不允许选择多条数据!"
+        });
+        return;
+      }
+      this.modelflag = true;
+      this.title = "编辑用户";
+      this.user = JSON.parse(JSON.stringify(selectRecords[0]));
+      this.user.enabled = this.user.enabled + "";
+      this.usernameflag = true;
+    },
+    remove() {
+      // 获取选中数据
+      let selectRecords = this.$refs.xGrid.getCheckboxRecords(),
+        ids = [];
+      if (selectRecords.length == 0) {
+        Notice.warning({
+          title: "消息通知",
+          desc: "请选择数据!"
+        });
+        return;
+      }
+      selectRecords.forEach((value, key, arr) => {
+        ids[key] = value.id;
+      });
+      this.$Modal.confirm({
+        title: "确定删除该用户？",
+        onOk: async () => {
+          remove(ids).then(res => {
+            Notice.success({
+              title: "消息通知",
+              desc: res.data.msg
+            });
+            // 重新加载表格
+            this.$refs.xGrid.commitProxy("reload");
+          });
+        },
+        closable: true
+      });
+    },
+    confirm() {
+      this.$refs.userForm.validate(async valid => {
+        if (valid) {
+          switch (this.title) {
+            case "新增用户":
+              save(this.user).then(res => {
+                Notice.success({
+                  title: "消息通知",
+                  desc: res.data.msg
+                });
+                this.modelflag = false;
+                // 重新加载表格
+                this.$refs.xGrid.commitProxy("reload");
+              });
+              break;
+            case "编辑用户":
+              update(this.user).then(res => {
+                Notice.success({
+                  title: "消息通知",
+                  desc: res.data.msg
+                });
+                this.modelflag = false;
+                // 重新加载表格
+                this.$refs.xGrid.commitProxy("reload");
+              });
+              break;
+          }
+        }
+      });
     }
   },
-  mounted () {
-    this.listForPage(this.page,this.pageSize);
-  }
-}
+  mounted() {}
+};
 </script>
 
 <style>
-
 </style>

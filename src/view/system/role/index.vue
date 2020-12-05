@@ -74,7 +74,7 @@ import { listForPage } from '@/api/system/role'
 import { buildTree } from '@/api/system/menu'
 import { saveRoleMenu } from '@/api/system/roleMenu'
 import { save, update, remove } from '@/api/system/role'
-import { Message } from 'iview'
+import { Notice } from 'iview'
 import { validateNumber } from "@/libs/validate"; // 正数验证
 export default {
   name: 'system_role',
@@ -248,12 +248,19 @@ export default {
     // 菜单保存
     roleMenuOk () {
       if (this.roleCode === 'admin') {
-        return Message.warning("暂不支持修改admin用户")
+        Notice.warning({
+          title: '消息通知',
+          desc: "暂不支持修改admin用户"
+        });
+        return
       }
       let treeNode = this.$refs.tree.getCheckedNodes()
       const params = { 'roleid': this.roleId,'rolemenu': treeNode }
       saveRoleMenu(JSON.stringify(params)).then(res => {
-        Message.success(res.data.message);
+        Notice.success({
+          title: '消息通知',
+          desc: res.data.msg
+        });
       })
     },
     // 查看关联菜单
@@ -295,14 +302,20 @@ export default {
                 switch (this.title) {
                     case '新增角色':
                         save(this.role).then(res => {
-                            Message.success(res.data.message);
+                            Notice.success({
+                              title: '消息通知',
+                              desc: res.data.msg
+                            });
                             this.add = false;
                             this.listForPage(this.page,this.pageSize);
                         })
                     break
                     case '编辑角色':
                         update(this.role).then(res => {
-                            Message.success(res.data.message);
+                            Notice.success({
+                              title: '消息通知',
+                              desc: res.data.msg
+                            });
                             this.add = false;
                             this.listForPage(this.page,this.pageSize);
                         })
@@ -321,7 +334,10 @@ export default {
             title: "确定删除该角色？",
             onOk: async () => {
                 remove({id: params.id}).then(res => {
-                    Message.success(res.data.message);
+                    Notice.success({
+                      title: '消息通知',
+                      desc: res.data.msg
+                    });
                     this.listForPage(this.page,this.pageSize);
                 })
             },

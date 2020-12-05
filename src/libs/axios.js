@@ -1,7 +1,9 @@
 import axios from 'axios'
-// import store from '@/store'
-import { Message } from 'iview'
+import router from '@/router/routers'
+import Cookies from 'js-cookie'
 import { getToken } from '@/libs/util'
+import { logout } from '@/api/user'
+import { Notice } from 'iview';
 // const addErrorLog = errorInfo => {
 //   const { statusText, status, request: { responseURL } } = errorInfo
 //   let info = {
@@ -45,8 +47,6 @@ class HttpRequest {
         config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
       }
       config.headers['Content-Type'] = 'application/json'
-
-
       return config
     }, error => {
       return Promise.reject(error)
@@ -55,21 +55,73 @@ class HttpRequest {
     instance.interceptors.response.use(res => {
       this.destroy(url)
       const { data, status } = res
-      return { data, status }
+      const code = data.code
+      if (code < 200 || code > 300) {
+        Notice.warning({
+          title: '消息通知',
+          desc: data.msg
+        });
+        return Promise.reject(error)
+      } else {
+        return { data, status }
+      }
     }, error => {
-      this.destroy(url)
-      let errorInfo = error.response
-      if (!errorInfo) {
-        const { request: { statusText, status }, config } = JSON.parse(JSON.stringify(error))
-        errorInfo = {
-          statusText,
-          status,
-          request: { responseURL: config.url }
+      // debugger
+      // this.destroy(url)
+      // let errorInfo = error.response
+      // if (!errorInfo) {
+      //   const { request: { statusText, status }, config } = JSON.parse(JSON.stringify(error))
+      //   errorInfo = {
+      //     statusText,
+      //     status,
+      //     request: { responseURL: config.url }
+      //   }
+      // }
+      let code = 0
+      try {
+        code = error.response.data.status
+      } catch (e) {
+        if (error.toString().indexOf('Error: timeout') !== -1) {
+          Notice.warning({
+            title: '消息通知',
+            desc: "网络请求超时"
+          });
+          return Promise.reject(error)
         }
       }
-      // addErrorLog(errorInfo)
-      Message.warning(errorInfo.data.message);
-      return Promise.reject(errorInfo.data)
+      if (code) {
+        if (code === 401) {
+          logout().then(() => {
+            Cookies.set('point', 401)
+            location.reload()
+          }).catch(err => {
+            reject(err)
+          })
+        } else if (code === 403) {
+          router.push({ path: '/401' })
+        } else {
+          const errorMsg = error.response.data.message
+          if (errorMsg !== undefined) {
+            Notice.warning({
+              title: '消息通知',
+              desc: errorMsg
+            });
+          }
+        }
+      } else {
+        if (code == undefined) {
+          const errcode = error.response.data.code
+          if (errcode === 400 || errcode === 401 || errcode === 403 || errcode === 404 || errcode === 500) {
+            Notice.warning({
+              title: '消息通知',
+              desc: error.response.data.msg
+            });
+          }
+          
+        }
+        
+      }
+      return Promise.reject(error)
     })
   }
   request (options) {

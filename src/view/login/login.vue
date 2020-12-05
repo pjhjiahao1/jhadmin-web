@@ -61,6 +61,7 @@
 import { mapActions } from 'vuex'
 import { setCookie, getCookie, removeCookie } from '@/libs/util'
 import { decrypt } from '@/libs/rsaEncrypt'
+import { Notice } from 'iview'
 export default {
   props: {
     userNameRules: {
@@ -142,6 +143,7 @@ export default {
               })
             })
           }).catch(err => {
+              this.loading = false
               this.getAuthCodes()
           })
         }
@@ -168,12 +170,24 @@ export default {
       this.form.password = password
       this.form.rememberMe = rememberMe === '' ? false : Boolean(rememberMe)
     },
+    point() {
+      const point = getCookie('point') !== ''
+      if (point) {
+        Notice.warning({
+          title: '消息通知',
+          desc: "当前登录状态已过期，请重新登录！"
+        });
+        removeCookie('point')
+      }
+    }
   },
   mounted () {
     // 获取验证码
     this.getAuthCodes()
     // 获取用户名密码等Cookie
     this.getCookie()
+    // token 过期提示
+    this.point()
   }
 }
 </script>

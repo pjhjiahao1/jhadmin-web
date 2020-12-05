@@ -12,7 +12,6 @@ import {
 } from '@/api/user'
 import { setToken, getToken } from '@/libs/util'
 import { encrypt } from '@/libs/rsaEncrypt'
-import store from '@/store'
 export default {
   state: {
     userName: '',
@@ -92,10 +91,6 @@ export default {
         }).then(res => {
           const data = res.data.data
           commit('setToken', data.token)
-          // 登录时 加载菜单
-          // store.dispatch('getMenuData').then(() => { 
-          //   
-          // })
           resolve(data)
         }).catch(err => {
           reject(err)
@@ -103,9 +98,9 @@ export default {
       })
     },
     // 退出登录
-    handleLogOut ({ state, commit }) {
+    handleLogOut ({ commit }) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
+        logout().then(() => {
           commit('setToken', '')
           commit('setAccess', [])
           commit('setHasGetRouter', false) // 退出登录时去除路由标识，重新加载路由菜单

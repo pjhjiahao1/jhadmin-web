@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { Message } from 'iview'
+import { Notice } from 'iview'
 export default {
   components: {
     

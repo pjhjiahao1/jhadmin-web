@@ -6,6 +6,7 @@
           <Icon :size="18" type="ios-close-circle-outline" />
         </Button>
         <DropdownMenu slot="list">
+          <DropdownItem name="refresh">刷新</DropdownItem>
           <DropdownItem name="close-all">关闭所有</DropdownItem>
           <DropdownItem name="close-others">关闭其他</DropdownItem>
         </DropdownMenu>
@@ -69,8 +70,10 @@ export default {
       contextMenuTop: 0,
       visible: false,
       menuList: {
+        refresh: '刷新',
         others: '关闭其他',
         all: '关闭所有'
+        
       }
     }
   },
@@ -112,12 +115,15 @@ export default {
         let res = this.list.filter(item => item.name === this.$config.homeName)
         this.$emit('on-close', res, 'all')
       } else if (type.includes('others')) {
+        debugger
         // 关闭除当前页和home页的其他页
         let res = this.list.filter(item => routeEqual(this.currentRouteObj, item) || item.name === this.$config.homeName)
         this.$emit('on-close', res, 'others', this.currentRouteObj)
         setTimeout(() => {
           this.getTagElementByRoute(this.currentRouteObj)
         }, 100)
+      } else if (type.includes('refresh')) {
+        alert(1)
       }
     },
     handleClose (current) {

@@ -6,7 +6,7 @@
         <Card :bordered="false">
             <p slot="title">目前进度</p>
             <p>JH-ADMIN 基于 Spring Boot 2.1.0 、 Mybatis、 JWT、Spring Security、Redis、Vue、iview 的前后端分离的后台管理系统， 项目采用按功能分模块的开发方式，权限控制采用 RBAC(角色访问控制) 思想，支持前端菜单动态路由等
-目前正在持续迭代开发中</p>
+目前正在持续迭代开发中 swagger接口： http://192.168.116.6:8000/swagger-ui.html#/ druid地址：http://localhost:8000/druid/api.html</p>
             <Row>
                 <Checkbox v-model="complete" disabled>基于Spring Security+JWT登录登出</Checkbox>
             </Row>

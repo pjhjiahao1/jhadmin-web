@@ -32,7 +32,9 @@
     "vue-router": "^3.0.1",
     "vuedraggable": "^2.16.0",
     "vuex": "^3.0.1",
+    "vxe-table": "^3.0.3",
     "wangeditor": "^3.1.1",
+    "xe-utils": "^3.0.3",
     "xlsx": "^0.13.3"
   },
   "devDependencies": {
