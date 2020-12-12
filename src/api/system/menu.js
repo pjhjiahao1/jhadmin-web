@@ -16,7 +16,7 @@ export const buildTree = (params) => {
 export const list = () => {
   return axios.request({
     url: 'api/menus',
-    method: 'get'
+    method: 'get',
   })
 }
 

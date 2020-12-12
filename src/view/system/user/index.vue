@@ -4,8 +4,9 @@
       <vxe-grid ref="xGrid" v-bind="gridOptions" :toolbar-config="tableToolbar">
         <template v-slot:toolbar_buttons>
           <vxe-button status="primary" @click="add">新增</vxe-button>
-          <vxe-button status="primary" @click="edit">编辑</vxe-button>
+          <vxe-button status="success" @click="edit">编辑</vxe-button>
           <vxe-button status="danger" @click="remove">删除</vxe-button>
+          <vxe-button status="warning" @click="exportExcel">导出</vxe-button>
         </template>
       </vxe-grid>
     </Card>
@@ -88,9 +89,16 @@
 
 <script>
 // api 地址 https://xuliangzhan_admin.gitee.io/vxe-table/#/table/api
-import { listForPage, save, update, remove } from "@/api/system/user";
+import {
+  listForPage,
+  save,
+  update,
+  remove,
+  exportExcel
+} from "@/api/system/user";
 import { getAllRole } from "@/api/system/role";
 import { validateTel, validateEmail } from "@/libs/validate"; // 手机号验证
+import { downloadFile } from '@/api/downUtils'
 import { Notice } from "iview";
 export default {
   name: "system_user",
@@ -100,7 +108,7 @@ export default {
       tableToolbar: {
         // 工具栏
         refresh: true,
-        export: true,
+        // export: true,
         custom: true,
         slots: {
           buttons: "toolbar_buttons"
@@ -276,12 +284,11 @@ export default {
           { field: "email", title: "邮箱", sortable: true },
           { field: "createTime", title: "创建日期", sortable: true }
         ],
-        exportConfig: {
-          remote: true,
-          exportMethod: this.exportMethod,
-          types: ["xlsx"],
-          modes: ["current", "selected", "all"]
-        },
+        // exportConfig: {
+        //   remote: true,
+        //   exportMethod: this.exportMethod,
+        //   types: ["xlsx"]
+        // },
         checkboxConfig: {
           reserve: true,
           highlight: true,
@@ -461,6 +468,13 @@ export default {
               break;
           }
         }
+      });
+    },
+    exportExcel() {
+      const proxyInfo = this.$refs.xGrid.getProxyInfo()
+      let queryData = proxyInfo.form
+      exportExcel(queryData).then(res => {
+        downloadFile(res.data,'用户管理','xlsx')
       });
     }
   },

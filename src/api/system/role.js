@@ -38,3 +38,15 @@ export const remove = (params) => {
     method: 'delete'
   })
 }
+
+export const exportExcel = (params) => {
+  return axios.request({
+    url: 'api/role/export',
+    method: 'post',
+    data: params,
+    responseType: "blob",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+}

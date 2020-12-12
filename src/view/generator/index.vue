@@ -49,7 +49,8 @@
 
 <script>
 import Tables from '_c/tables'
-import { listForPage,build,exportFile,downloadFile } from '@/api/generator/generator'
+import { listForPage,build,exportFile } from '@/api/generator/generator'
+import { downloadFile } from '@/api/downUtils'
 import { Notice } from 'iview'
 export default {
   components: {Tables},

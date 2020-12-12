@@ -4,11 +4,24 @@
       <vxe-grid ref="xGrid" v-bind="gridOptions" :toolbar-config="tableToolbar">
         <template v-slot:toolbar_buttons>
           <vxe-button status="primary" @click="add">新增</vxe-button>
-          <vxe-button status="primary" @click="edit">编辑</vxe-button>
+          <vxe-button status="success" @click="edit">编辑</vxe-button>
           <vxe-button status="danger" @click="remove">删除</vxe-button>
+          <vxe-button status="primary" @click="relateMenus">关联菜单</vxe-button>
+          <vxe-button status="warning" @click="exportExcel">导出</vxe-button>
         </template>
       </vxe-grid>
     </Card>
+    <Modal
+        v-model="menuFlag"
+        title="关联菜单"
+        :mask-closable="false"
+        :closable="false"
+        @on-ok="roleMenuOk"
+        width="500">
+        <Card>
+          <Tree ref="tree" :data="baseData" show-checkbox></Tree>
+        </Card>
+    </Modal>
     <Modal
       v-model="modelflag"
       :title="title"
@@ -57,11 +70,12 @@
 
 <script>
 // api 地址 https://xuliangzhan_admin.gitee.io/vxe-table/#/table/api
-import { listForPage, save, update, remove } from "@/api/system/role";
+import { listForPage, save, update, remove, exportExcel } from "@/api/system/role";
 import { Notice } from "iview";
 import { validateNumber } from "@/libs/validate"; // 正数验证
 import { buildTree } from "@/api/system/menu";
 import { saveRoleMenu } from "@/api/system/roleMenu";
+import { downloadFile } from '@/api/downUtils'
 export default {
   name: "system_role",
   components: {},
@@ -70,7 +84,7 @@ export default {
       tableToolbar: {
         // 工具栏
         refresh: true,
-        export: true,
+        // export: true,
         custom: true,
         slots: {
           buttons: "toolbar_buttons",
@@ -261,6 +275,8 @@ export default {
         roleDesc: "",
         sort: 1,
       },
+      menuFlag: false,
+      baseData: [],
     };
   },
   async created() {},
@@ -359,6 +375,61 @@ export default {
         }
       });
     },
+    // 查看关联菜单
+    relateMenus () {
+      // 获取选中数据
+      let selectRecords = this.$refs.xGrid.getCheckboxRecords()
+      if (selectRecords.length == 0) {
+        Notice.warning({
+          title: "消息通知",
+          desc: "请选择数据!",
+        });
+        return;
+      } else if (selectRecords.length > 1) {
+        Notice.warning({
+          title: "消息通知",
+          desc: "不允许选择多条数据!",
+        });
+        return;
+      }
+      this.menuFlag = true
+      this.roleId = selectRecords[0].id
+      this.roleCode = selectRecords[0].roleCode
+      this.baseData = []
+      this.buildTree(selectRecords[0].roleCode)
+    },
+    // 构建菜单树
+    buildTree (roleCode) {
+      const params = { rolecode: roleCode }
+      buildTree(params).then(res => {
+        this.baseData = res.data.data
+      })
+    },
+    // 关联菜单保存
+    roleMenuOk () {
+      if (this.roleCode === 'admin') {
+        Notice.warning({
+          title: '消息通知',
+          desc: "暂不支持修改admin用户"
+        });
+        return
+      }
+      let treeNode = this.$refs.tree.getCheckedNodes()
+      const params = { 'roleid': this.roleId,'rolemenu': treeNode }
+      saveRoleMenu(JSON.stringify(params)).then(res => {
+        Notice.success({
+          title: '消息通知',
+          desc: res.data.msg
+        });
+      })
+    },
+    exportExcel() {
+      const proxyInfo = this.$refs.xGrid.getProxyInfo()
+      let queryData = proxyInfo.form
+      exportExcel(queryData).then(res => {
+        downloadFile(res.data,'角色管理','xlsx')
+      });
+    }
   },
   mounted() {},
 };
