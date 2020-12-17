@@ -407,13 +407,13 @@ export default {
     },
     // 关联菜单保存
     roleMenuOk () {
-      if (this.roleCode === 'admin') {
-        Notice.warning({
-          title: '消息通知',
-          desc: "暂不支持修改admin用户"
-        });
-        return
-      }
+      // if (this.roleCode === 'admin') {
+      //   Notice.warning({
+      //     title: '消息通知',
+      //     desc: "暂不支持修改admin用户"
+      //   });
+      //   return
+      // }
       let treeNode = this.$refs.tree.getCheckedNodes()
       const params = { 'roleid': this.roleId,'rolemenu': treeNode }
       saveRoleMenu(JSON.stringify(params)).then(res => {
