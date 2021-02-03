@@ -73,7 +73,6 @@ export default {
         refresh: '刷新',
         others: '关闭其他',
         all: '关闭所有'
-        
       }
     }
   },
@@ -115,7 +114,6 @@ export default {
         let res = this.list.filter(item => item.name === this.$config.homeName)
         this.$emit('on-close', res, 'all')
       } else if (type.includes('others')) {
-        debugger
         // 关闭除当前页和home页的其他页
         let res = this.list.filter(item => routeEqual(this.currentRouteObj, item) || item.name === this.$config.homeName)
         this.$emit('on-close', res, 'others', this.currentRouteObj)
@@ -123,7 +121,11 @@ export default {
           this.getTagElementByRoute(this.currentRouteObj)
         }, 100)
       } else if (type.includes('refresh')) {
-        alert(1)
+        // 刷新当前路由
+        const { fullPath } = this.$route
+        this.$router.replace({
+          path: '/redirect' + fullPath
+        })
       }
     },
     handleClose (current) {

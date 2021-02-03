@@ -13,9 +13,10 @@ export const buildTree = (params) => {
     method: 'get'
   })
 }
-export const list = () => {
+export const list = (params) => {
   return axios.request({
     url: 'api/menus',
+    params,
     method: 'get',
   })
 }

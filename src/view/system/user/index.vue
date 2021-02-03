@@ -15,6 +15,12 @@
               <vxe-button status="danger" @click="remove">删除</vxe-button>
               <vxe-button status="warning" @click="exportExcel">导出</vxe-button>
             </template>
+            <template v-slot:statusScope="{ row }">
+                <i-switch size="large" v-model=row.enabled :true-value='1' :false-value='0' disabled>
+                  <span slot="open">启用</span>
+                  <span slot="close">禁用</span>
+                </i-switch>
+            </template>
           </vxe-grid>
         </Card>
       </i-col>
@@ -103,12 +109,12 @@
           <i-col span="12">
             <FormItem label="状态：">
               <RadioGroup v-model="user.enabled">
-                <Radio label="1">
-                  <span>激活</span>
+                <Radio v-for="item in dict.YHZT" :key="item.id" :label="item.value">
+                  <span>{{ item.name }}</span>
                 </Radio>
-                <Radio label="0">
+                <!-- <Radio label="0">
                   <span>禁用</span>
-                </Radio>
+                </Radio> -->
               </RadioGroup>
             </FormItem>
           </i-col>
@@ -151,8 +157,11 @@ let windowHeight = document.documentElement.clientHeight - 150;
 export default {
   name: "system_user",
   components: { selectTree },
+  // 数据字典
+  dicts: ['YHZT'],
   data() {
     return {
+      value10: "1",
       treeData: [],
       treeAlertData: [],
       tableToolbar: {
@@ -325,14 +334,7 @@ export default {
           {
             field: "enabled",
             title: "状态",
-            sortable: true,
-            formatter: function({ cellValue }) {
-              if (cellValue == 1) {
-                return "启用";
-              } else {
-                return "禁用";
-              }
-            }
+            slots: { default: "statusScope" }
           },
           { field: "phone", title: "手机号", sortable: true },
           { field: "email", title: "邮箱", sortable: true },
@@ -521,7 +523,7 @@ export default {
       this.modelflag = true;
       this.title = "编辑用户";
       this.user = JSON.parse(JSON.stringify(selectRecords[0]));
-      this.user.enabled = this.user.enabled + "";
+      this.user.enabled = this.user.enabled.toString();
       this.usernameflag = true;
       this.getTreeAlertData(0);
     },

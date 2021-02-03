@@ -8,6 +8,12 @@
           <vxe-button status="danger" @click="remove">删除</vxe-button>
           <vxe-button status="warning" @click="exportExcel">导出</vxe-button>
         </template>
+        <template v-slot:statusScope="{ row }">
+                <i-switch size="large" v-model=row.status :true-value='0' :false-value='1' disabled>
+                  <span slot="open">启用</span>
+                  <span slot="close">禁用</span>
+                </i-switch>
+            </template>
       </vxe-grid>
     </Card>
     <Modal
@@ -26,10 +32,10 @@
         <FormItem prop="status" label="状态">
            <Select v-model="sysJob.status">
             <Option
-              v-for="item in statusData"
+              v-for="item in dict.YXX"
               :value="item.value"
-              :key="item.value"
-            >{{ item.label }}</Option>
+              :key="item.id"
+            >{{ item.name }}</Option>
           </Select>
         </FormItem>
        
@@ -57,6 +63,8 @@ import { downloadFile } from "@/api/downUtils";
 export default {
   name: "system_job",
   components: {},
+    // 数据字典
+  dicts: ['YXX'],
   data() {
     return {
       statusData: [
@@ -164,14 +172,7 @@ export default {
           {
             field: "enabled",
             title: "状态",
-            sortable: true,
-            formatter: function({ cellValue }) {
-              if (cellValue == 1) {
-                return "禁用";
-              } else {
-                return "启用";
-              }
-            }
+            slots: { default: "statusScope" }
           },
           { field: "createTime", title: "创建日期", sortable: true }
         ],

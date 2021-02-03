@@ -20,6 +20,12 @@
           <vxe-button status="success" @click="edit(row)">编辑</vxe-button>
           <vxe-button status="danger" @click="remove(row)">删除</vxe-button>
         </template>
+        <template v-slot:statusScope="{ row }">
+                <i-switch size="large" v-model=row.status :true-value='0' :false-value='1' disabled>
+                  <span slot="open">启用</span>
+                  <span slot="close">禁用</span>
+                </i-switch>
+            </template>
       </vxe-grid>
     </Card>
     <Modal
@@ -45,10 +51,10 @@
         <FormItem label="状态">
           <Select v-model="sysDept.status">
             <Option
-              v-for="item in statusData"
+              v-for="item in dict.YXX"
               :value="item.value"
-              :key="item.value"
-            >{{ item.label }}</Option>
+              :key="item.id"
+            >{{ item.name }}</Option>
           </Select>
         </FormItem>
         <FormItem label="上级部门" v-if="deptType === 'N'">
@@ -98,6 +104,8 @@ import { validateNumber } from "@/libs/validate"; // 正数验证
 export default {
   name: "system_dept",
   components: {},
+  // 数据字典
+  dicts: ['YXX'],
   data() {
     return {
       statusData: [
@@ -229,16 +237,10 @@ export default {
         { field: "deptName", title: "名称", treeNode: true },
         { field: "sort", title: "排序" },
         {
-          field: "status",
-          title: "状态",
-          formatter: function({ cellValue }) {
-            if (Number(cellValue) === 0) {
-              return "启用";
-            } else {
-              return "禁用";
-            }
-          }
-        },
+            field: "status",
+            title: "状态",
+            slots: { default: "statusScope" }
+          },
         { field: "createTime", title: "创建时间" },
         { title: "操作", width: 200, slots: { default: "operate" } }
       ]

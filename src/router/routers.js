@@ -18,99 +18,117 @@ import parentView from '@/components/parent-view'
  *  beforeCloseName: (-) 设置该字段，则在关闭当前tab页时会去'@/router/before-close.js'里寻找该字段名对应的方法，作为关闭前的钩子函数
  * }
  */
-export default [{
-    path: '/login',
-    name: 'login',
+export default [
+  {
+  path: '/login',
+  name: 'login',
+  meta: {
+    title: 'Login - 登录',
+    hideInMenu: true
+  },
+  component: () =>
+    import('@/view/login/login.vue')
+},
+{
+  path: '/',
+  name: '_home',
+  redirect: '/home',
+  component: Main,
+  meta: {
+    hideInMenu: false,
+    notCache: true
+  },
+  children: [{
+    path: '/home',
+    name: 'home',
     meta: {
-      title: 'Login - 登录',
-      hideInMenu: true
+      hideInMenu: false,
+      title: '首页',
+      notCache: true,
+      icon: 'md-home'
     },
     component: () =>
-      import ('@/view/login/login.vue')
+      import('@/view/single-page/home')
+  }]
+},
+// {
+//   path: '/message',
+//   name: 'message',
+//   component: Main,
+//   meta: {
+//       hideInBread: true,
+//       hideInMenu: false
+//   },
+//   children: [{
+//       path: 'message_page',
+//       name: 'message_page',
+//       meta: {
+//           icon: 'md-notifications',
+//           title: '消息中心'
+//       },
+//       component: () =>
+//           import ('@/view/single-page/message/index.vue')
+//   }]
+// },
+// {
+//   path: '/progress',
+//   name: 'progress',
+//   component: Main,
+//   meta: {
+//     hideInBread: true
+//   },
+//   children: [{
+//     path: 'progress_page',
+//     name: 'progress_page',
+//     meta: {
+//       icon: 'md-notifications',
+//       title: '项目进度'
+//     },
+//     component: () =>
+//       import('@/view/progress/index.vue')
+//   }]
+// },
+{
+  path: '',
+  name: 'doc',
+  meta: {
+    title: '文档',
+    href: 'http://jiahaopan.gitee.io/pjhjiahao1.github.io',
+    icon: 'ios-book'
+  }
+},
+{
+  path: '/401',
+  name: 'error_401',
+  meta: {
+    hideInMenu: true
   },
-    {
-      path: '/',
-      name: '_home',
-      redirect: '/home',
-      component: Main,
-      meta: {
-        hideInMenu: false,
-        notCache: true
-      },
-      children: [{
-        path: '/home',
-        name: 'home',
-        meta: {
-          hideInMenu: false,
-          title: '首页',
-          notCache: true,
-          icon: 'md-home'
-        },
-        component: () =>
-          import ('@/view/single-page/home')
-      }]
-    },
-    // {
-    //   path: '/message',
-    //   name: 'message',
-    //   component: Main,
-    //   meta: {
-    //       hideInBread: true,
-    //       hideInMenu: false
-    //   },
-    //   children: [{
-    //       path: 'message_page',
-    //       name: 'message_page',
-    //       meta: {
-    //           icon: 'md-notifications',
-    //           title: '消息中心'
-    //       },
-    //       component: () =>
-    //           import ('@/view/single-page/message/index.vue')
-    //   }]
-    // },
-    {
-      path: '/progress',
-      name: 'progress',
-      component: Main,
-      meta: {
-        hideInBread: true
-      },
-      children: [{
-          path: 'progress_page',
-          name: 'progress_page',
-          meta: {
-              icon: 'md-notifications',
-              title: '项目进度'
-          },
-          component: () =>
-              import ('@/view/progress/index.vue')
-      }]
-    },
-    {
-      path: '/401',
-      name: 'error_401',
-      meta: {
-        hideInMenu: true
-      },
-      component: () =>
-        import ('@/view/error-page/401.vue')
-    },
-    {
-      path: '/500',
-      name: 'error_500',
-      meta: {
-        hideInMenu: true
-      },
-      component: () =>
-        import ('@/view/error-page/500.vue')
-    }
-    // {
-    //   path: '/404',
-    //   name: 'error_404',
-    //   meta: {
-    //     hideInMenu: true
-    //   },
-    //   component: () => import('@/view/error-page/404.vue')
-    // }
-  ]
+  component: () =>
+    import('@/view/error-page/401.vue')
+},
+{
+  path: '/500',
+  name: 'error_500',
+  meta: {
+    hideInMenu: true
+  },
+  component: () =>
+    import('@/view/error-page/500.vue')
+},
+{
+  path: '/redirect/:path*',
+  name: '',
+  meta: {
+    hideInMenu: true
+  },
+  component: () => import('@/view/redirect/index')
+}
+  // {
+  //   path: '/404',
+  //   name: 'error_404',
+  //   meta: {
+  //     hideInMenu: true
+  //   },
+  //   component: () => import('@/view/error-page/404.vue')
+  // }
+]

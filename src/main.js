@@ -19,7 +19,12 @@ import 'v-org-tree/dist/v-org-tree.css'
 import 'xe-utils'
 import VXETable from 'vxe-table'
 import 'vxe-table/lib/style.css'
+// 数据字典
+import dict from './components/Dict'
+// 需要安装依赖：npm install --save echarts-gl，并添加如下引用
+
 Vue.use(VXETable)
+Vue.use(dict)
 
 // 实际打包时应该不引入mock
 /* eslint-disable */

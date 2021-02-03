@@ -7,10 +7,12 @@
           <vxe-button status="success" @click="edit">编辑</vxe-button>
           <vxe-button status="danger" @click="remove">删除</vxe-button>
           <vxe-button status="warning" @click="exportExcel">导出</vxe-button>
+          <vxe-button status="info" @click="info">日志</vxe-button>
         </template>
         <template v-slot:operate="{ row }">
-          <vxe-button type="text" status="primary" content="执行"></vxe-button>
-          <vxe-button type="text" status="primary" content="启用"></vxe-button>
+          <vxe-button type="text" status="primary" content="执行" @click="execute(row)"></vxe-button>
+          <vxe-button type="text" status="primary" content="启用" @click="resume(row)"></vxe-button>
+          <vxe-button type="text" status="primary" content="暂停" @click="pause(row)"></vxe-button>
         </template>
       </vxe-grid>
     </Card>
@@ -77,19 +79,18 @@
             <FormItem label="状态">
               <RadioGroup v-model="sysQuartzJob.isPause">
                 <Radio label="1">
-                  <span>启动</span>
+                  <span>暂停</span>
                 </Radio>
                 <Radio label="0">
-                  <span>暂停</span>
+                  <span>启用</span>
                 </Radio>
               </RadioGroup>
             </FormItem>
           </i-col>
-
         </Row>
         <FormItem label="参数">
-              <Input placeholder="请输入" type="textarea" :rows="4" v-model="sysQuartzJob.params" />
-            </FormItem>
+          <Input placeholder="请输入" type="textarea" :rows="4" v-model="sysQuartzJob.params" />
+        </FormItem>
         <Row type="flex" justify="end" class="code-row-bg">
           <FormItem>
             <Button type="primary" @click="confirm('sysQuartzJobForm')">确定</Button>
@@ -98,6 +99,35 @@
         </Row>
       </Form>
     </Modal>
+    <!-- 日志窗口 -->
+    <vxe-modal
+      v-model="infoValue"
+      id="myModal"
+      width="1200"
+      height="700"
+      min-width="1200"
+      min-height="700"
+      show-zoom
+      resize
+      remember
+      storage
+      transfer
+    >
+      <template v-slot>
+        <vxe-grid
+          border
+          resizable
+          show-overflow
+          auto-resize
+          height="auto"
+          :sync-resize="infoValue"
+          :pager-config="infoPage"
+          :proxy-config="infoProxy"
+          :columns="infoColumn"
+          :toolbar-config="infoToolbar"
+        ></vxe-grid>
+      </template>
+    </vxe-modal>
   </div>
 </template>
 
@@ -107,7 +137,11 @@ import {
   save,
   update,
   remove,
-  exportExcel
+  exportExcel,
+  run,
+  pause,
+  resume,
+  infoListForPage
 } from "@/api/system/timing";
 import { downloadFile } from "@/api/downUtils";
 import { Notice } from "iview";
@@ -306,16 +340,27 @@ export default {
         columns: [
           { type: "checkbox", width: 40 },
           { type: "seq", title: "序号", width: 50 },
-          { field: "id", title: "任务ID", sortable: true },
+          // { field: "id", title: "任务ID", sortable: true },
           { field: "jobName", title: "任务名称", sortable: true },
           { field: "beanName", title: "Bean名称", sortable: true },
           { field: "methodName", title: "执行方法", sortable: true },
           { field: "params", title: "参数", sortable: true },
           { field: "cronExpression", title: "cron表达式", sortable: true },
-          { field: "isPause", title: "状态", sortable: true },
+          {
+            field: "isPause",
+            title: "状态",
+            sortable: true,
+            formatter: function({ cellValue }) {
+              if (cellValue == 1) {
+                return "暂停";
+              } else {
+                return "启用";
+              }
+            }
+          },
           { field: "description", title: "描述", sortable: true },
           { field: "createTime", title: "创建时间", sortable: true },
-          { title: "操作", width: 100, slots: { default: "operate" } }
+          { title: "操作", width: 130, slots: { default: "operate" } }
         ],
         checkboxConfig: {
           reserve: true,
@@ -336,7 +381,8 @@ export default {
         personInCharge: "",
         email: "",
         subTask: "",
-        pauseAfterFailure: "1"
+        pauseAfterFailure: "1",
+        pid: ""
       },
       modelflag: false,
       ruleInline: {
@@ -452,11 +498,124 @@ export default {
             trigger: "change"
           }
         ]
-      }
+      },
+      infoValue: false,
+      infoPage: {
+        pageSize: 10
+      },
+      infoToolbar: {
+        refresh: true,
+        custom: true
+      },
+      infoProxy: {
+        props: {
+          result: "result",
+          total: "page.total"
+        },
+        ajax: {
+          seq: true, // 启用动态序号代理
+          form: true, // 启用表单代理
+          // 接收 Promise 对象
+          query: ({ page, form }) => {
+            // // 处理排序条件
+            const queryParams = Object.assign(
+              {
+                pageSize: page.pageSize,
+                currentPage: page.currentPage
+              },
+              form
+            );
+            return this.infolist(queryParams);
+          }
+        }
+      },
+      infoColumn: [
+        { type: "checkbox", width: 40 },
+        { type: "seq", title: "序号", width: 50 },
+        { field: "jobName", title: "任务名称", sortable: true },
+        { field: "beanName", title: "Bean名称", sortable: true },
+        { field: "methodName", title: "执行方法", sortable: true },
+        { field: "params", title: "参数", sortable: true },
+        { field: "cronExpression", title: "表达式", sortable: true },
+        { field: "exceptionDetail", title: "异常信息", sortable: true },
+        { field: "time", title: "耗时(毫秒)", sortable: true },
+        { field: "isSuccess", title: "状态", sortable: true,
+            formatter: function({ cellValue }) {
+              if (cellValue == 1) {
+                return "失败";
+              } else {
+                return "成功";
+              }
+            } },
+        { field: "createTime", title: "创建时间", sortable: true ,width: 200}
+      ]
     };
   },
   async created() {},
   methods: {
+    infolist(queryParams) {
+      return new Promise(resolve => {
+          queryParams.pid = this.pid
+          infoListForPage(queryParams).then(res => {
+            resolve({
+              result: res.data.data.list,
+              page: { total: Number(res.data.data.total) }
+            });
+          });
+        });
+    },
+    info() {
+      // 获取选中数据
+      let selectRecords = this.$refs.xGrid.getCheckboxRecords();
+      if (selectRecords.length == 0) {
+        Notice.warning({
+          title: "消息通知",
+          desc: "请选择数据!"
+        });
+        return;
+      } else if (selectRecords.length > 1) {
+        Notice.warning({
+          title: "消息通知",
+          desc: "不允许选择多条数据!"
+        });
+        return;
+      }
+      this.infoValue = true;
+      this.sysQuartzJob = JSON.parse(JSON.stringify(selectRecords[0]));
+    },
+    resume(row) {
+      const params = { job: row.uid };
+      resume(params).then(res => {
+        Notice.success({
+          title: "消息通知",
+          desc: res.data.msg
+        });
+        // 重新加载表格
+        this.$refs.xGrid.commitProxy("reload");
+      });
+    },
+    pause(row) {
+      const params = { job: row.uid };
+      pause(params).then(res => {
+        Notice.success({
+          title: "消息通知",
+          desc: res.data.msg
+        });
+        // 重新加载表格
+        this.$refs.xGrid.commitProxy("reload");
+      });
+    },
+    execute(row) {
+      const params = { job: row.uid };
+      run(params).then(res => {
+        Notice.success({
+          title: "消息通知",
+          desc: res.data.msg
+        });
+        // 重新加载表格
+        this.$refs.xGrid.commitProxy("reload");
+      });
+    },
     list(queryParams) {
       return new Promise(resolve => {
         listForPage(queryParams).then(res => {
@@ -521,7 +680,9 @@ export default {
       this.modelflag = true;
       this.title = "编辑";
       this.sysQuartzJob = JSON.parse(JSON.stringify(selectRecords[0]));
-      this.sysQuartzJob.status = this.sysQuartzJob.status + "";
+      this.sysQuartzJob.pauseAfterFailure =
+        this.sysQuartzJob.pauseAfterFailure + "";
+      this.sysQuartzJob.isPause = this.sysQuartzJob.isPause + "";
     },
     remove(params) {
       // 获取选中数据
