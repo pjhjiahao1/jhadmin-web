@@ -592,7 +592,7 @@ export default {
         });
         // 重新加载表格
         this.$refs.xGrid.commitProxy("reload");
-      });
+      }).catch((e) => {});
     },
     pause(row) {
       const params = { job: row.uid };
@@ -603,7 +603,7 @@ export default {
         });
         // 重新加载表格
         this.$refs.xGrid.commitProxy("reload");
-      });
+      }).catch((e) => {});
     },
     execute(row) {
       const params = { job: row.uid };
@@ -614,7 +614,7 @@ export default {
         });
         // 重新加载表格
         this.$refs.xGrid.commitProxy("reload");
-      });
+      }).catch((e) => {});
     },
     list(queryParams) {
       return new Promise(resolve => {
@@ -644,7 +644,7 @@ export default {
                 this.modelflag = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});
               break;
             case "编辑":
               update(this.sysQuartzJob).then(res => {
@@ -655,7 +655,7 @@ export default {
                 this.modelflag = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});
               break;
           }
         }
@@ -681,7 +681,7 @@ export default {
       this.title = "编辑";
       this.sysQuartzJob = JSON.parse(JSON.stringify(selectRecords[0]));
       this.sysQuartzJob.pauseAfterFailure =
-        this.sysQuartzJob.pauseAfterFailure + "";
+      this.sysQuartzJob.pauseAfterFailure + "";
       this.sysQuartzJob.isPause = this.sysQuartzJob.isPause + "";
     },
     remove(params) {
@@ -709,7 +709,7 @@ export default {
             });
             // 重新加载表格
             _this.$refs.xGrid.commitProxy("reload");
-          });
+          }).catch((e) => {});
         },
         closable: true
       });

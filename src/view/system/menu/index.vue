@@ -224,7 +224,6 @@ export default {
     ok() {
       this.$refs.menuForm.validate(async valid => {
         if (valid) {
-          debugger;
           switch (this.title) {
             case "新增":
               save(this.menu).then(res => {
@@ -235,7 +234,7 @@ export default {
                 this.show = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});;
               break;
             case "编辑":
               update(this.menu).then(res => {
@@ -246,7 +245,7 @@ export default {
                 this.show = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});;
               break;
           }
         }
@@ -255,7 +254,7 @@ export default {
     getFirstMenu() {
       firstMenu().then(res => {
         this.firstMenuData = res.data.data;
-      });
+      }).catch((e) => {});;
     },
     redioChange(value) {
       if (value == 1) {
@@ -270,7 +269,7 @@ export default {
       return new Promise(resolve => {
         list({ pid: val }).then(res => {
           resolve(res.data.data);
-        });
+        }).catch((e) => {});;
       });
     },
     loadChildrenMethod({ row }) {
@@ -296,10 +295,10 @@ export default {
         this.menu = res.data.data[0];
         this.menu.isLeaf = this.menu.isLeaf.toString();
         this.redioChange(this.menu.isLeaf);
-      });
+      }).catch((e) => {});;
     },
     remove(row) {
-      if (row.isLeaf == 0 && row.children.length > 0) {
+      if (row.isLeaf == 0 && (row.children == null || row.children.length > 0)) {
         Notice.warning({
           title: "消息通知",
           desc: "该目录下存在子菜单！"
@@ -317,7 +316,7 @@ export default {
             });
             // 重新加载表格
             _this.$refs.xGrid.commitProxy("reload");
-          });
+          }).catch((e) => {});;
         },
         closable: true
       });

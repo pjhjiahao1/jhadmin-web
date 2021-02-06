@@ -169,15 +169,6 @@ export default {
               }
             },
             {
-              field: "location",
-              title: "操作地点",
-              span: 8,
-              itemRender: {
-                name: "$input",
-                props: { placeholder: "请输入" }
-              }
-            },
-            {
               span: 24,
               align: "center",
               collapseNode: true,
@@ -225,7 +216,6 @@ export default {
           { type: "seq", title: "序号", width: 50 },
           { field: "userName", title: "用户名", sortable: true },
           { field: "ip", title: "IP", sortable: true },
-          { field: "location", title: "操作地点", sortable: true },
           { field: "description", title: "操作描述", sortable: true },
           { field: "browser", title: "浏览器", sortable: true },
           {
@@ -423,7 +413,7 @@ export default {
                 this.modelflag = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});
               break;
             case "编辑":
               update(this.sysLog).then(res => {
@@ -434,7 +424,7 @@ export default {
                 this.modelflag = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});
               break;
           }
         }
@@ -486,7 +476,7 @@ export default {
             });
             // 重新加载表格
             _this.$refs.xGrid.commitProxy("reload");
-          });
+          }).catch((e) => {});
         },
         closable: true
       });

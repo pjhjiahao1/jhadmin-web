@@ -293,7 +293,7 @@ export default {
                 this.modelflag = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});
               break;
             case "编辑":
               update(this.sysOnline).then(res => {
@@ -304,7 +304,7 @@ export default {
                 this.modelflag = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});
               break;
           }
         }
@@ -356,7 +356,7 @@ export default {
             });
             // 重新加载表格
             _this.$refs.xGrid.commitProxy("reload");
-          });
+          }).catch((e) => {});
         },
         closable: true
       });

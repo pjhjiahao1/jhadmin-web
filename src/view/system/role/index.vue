@@ -206,12 +206,6 @@ export default {
           { field: "sort", title: "排序", sortable: true },
           { field: "createTime", title: "创建日期", sortable: true },
         ],
-        exportConfig: {
-          remote: true,
-          exportMethod: this.exportMethod,
-          types: ["xlsx"],
-          modes: ["current", "selected", "all"],
-        },
         checkboxConfig: {
           reserve: true,
           highlight: true,
@@ -340,7 +334,7 @@ export default {
             });
             // 重新加载表格
             this.$refs.xGrid.commitProxy("reload");
-          });
+          }).catch((e) => {});
         },
         closable: true,
       });
@@ -358,7 +352,7 @@ export default {
                 this.modelflag = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});
               break;
             case "编辑角色":
               update(this.role).then((res) => {
@@ -369,7 +363,7 @@ export default {
                 this.modelflag = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});
               break;
           }
         }
@@ -403,7 +397,7 @@ export default {
       const params = { rolecode: roleCode }
       buildTree(params).then(res => {
         this.baseData = res.data.data
-      })
+      }).catch((e) => {});
     },
     // 关联菜单保存
     roleMenuOk () {
@@ -421,7 +415,7 @@ export default {
           title: '消息通知',
           desc: res.data.msg
         });
-      })
+      }).catch((e) => {});
     },
     exportExcel() {
       const proxyInfo = this.$refs.xGrid.getProxyInfo()

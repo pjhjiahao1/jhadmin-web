@@ -206,7 +206,7 @@ export default {
     getTreeAlertData(val) {
       find({ parent: val }).then(res => {
         this.treeAlertData = res.data.data;
-      });
+      }).catch((e) => {});
     },
     list() {
       return new Promise(resolve => {
@@ -252,7 +252,7 @@ export default {
                 this.modelflag = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});
               break;
             case "编辑":
               update(this.sysDict).then(res => {
@@ -263,7 +263,7 @@ export default {
                 this.modelflag = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});
               break;
           }
         }
@@ -292,7 +292,7 @@ export default {
             });
             // 重新加载表格
             _this.$refs.xGrid.commitProxy("reload");
-          });
+          }).catch((e) => {});
         },
         closable: true
       });

@@ -486,13 +486,14 @@ export default {
         title: "确定删除该用户？",
         onOk: async () => {
           remove(ids).then(res => {
+            debugger
             Notice.success({
               title: "消息通知",
               desc: res.data.msg
             });
             // 重新加载表格
             this.$refs.xGrid.commitProxy("reload");
-          });
+          }).catch((e) => {});
         },
         closable: true
       });
@@ -510,7 +511,7 @@ export default {
                 this.modelflag = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});
               break;
             case "编辑用户":
               update(this.user).then(res => {
@@ -521,7 +522,7 @@ export default {
                 this.modelflag = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});
               break;
           }
         }

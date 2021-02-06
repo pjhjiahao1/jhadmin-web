@@ -258,12 +258,12 @@ export default {
     getTreeData(val) {
       getTreeData({ pid: val }).then(res => {
         this.treeData = res.data.data;
-      });
+      }).catch((e) => {});
     },
     getTreeChildrenData(val) {
       getTreeData({ pid: val }).then(res => {
         callback(res.data.data);
-      });
+      }).catch((e) => {});
     },
     add() {
       this.title = "新增";
@@ -290,7 +290,7 @@ export default {
                 this.modelflag = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});
               break;
             case "编辑":
               update(this.sysDept).then(res => {
@@ -301,7 +301,7 @@ export default {
                 this.modelflag = false;
                 // 重新加载表格
                 this.$refs.xGrid.commitProxy("reload");
-              });
+              }).catch((e) => {});
               break;
           }
         }
@@ -315,7 +315,7 @@ export default {
         this.sysDept.status = res.data.data[0].status + "";
         this.getTreeData(0);
         this.modelflag = true;
-      });
+      }).catch((e) => {});
     },
     remove(params) {
       // 获取选中数据
@@ -332,7 +332,7 @@ export default {
             });
             // 重新加载表格
             _this.$refs.xGrid.commitProxy("reload");
-          });
+          }).catch((e) => {});
         },
         closable: true
       });

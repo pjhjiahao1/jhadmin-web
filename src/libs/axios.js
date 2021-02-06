@@ -61,7 +61,7 @@ class HttpRequest {
           title: '消息通知',
           desc: data.msg
         });
-        return Promise.reject(error)
+        return Promise.reject("")
       } else {
         return { data, status }
       }

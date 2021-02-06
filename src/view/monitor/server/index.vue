@@ -92,7 +92,7 @@
               >
                 <div class="demo-Circle-custom">
                   <h3>交换区使用率</h3>
-                  <p>{{parseFloat(swap.usageRate)}}%</p>
+                  <p>{{parseFloat(swap.usageRate == undefined || swap.usageRate == null || swap.usageRate == ''? 0: swap.usageRate)}}%</p>
                   <span>
                     <i>{{ swap.used }} / {{ swap.total }}</i>
                   </span>
