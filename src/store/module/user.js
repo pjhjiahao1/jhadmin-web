@@ -120,7 +120,7 @@ export default {
         try {
           getUserInfo(state.token).then(res => {
             const data = res.data.data
-            commit('setAvatar', 'https://file.iviewui.com/dist/a0e88e83800f138b94d2414621bd9704.png') // 图标
+            commit('setAvatar', 'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3649178992,1821853682&fm=26&gp=0.jpg') // 图标 
             commit('setUserName', data.username) // 用户名
             commit('setUserId', data.id)
             commit('setHasGetInfo', true)

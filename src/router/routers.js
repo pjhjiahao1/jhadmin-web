@@ -70,24 +70,24 @@ export default [
 //           import ('@/view/single-page/message/index.vue')
 //   }]
 // },
-// {
-//   path: '/progress',
-//   name: 'progress',
-//   component: Main,
-//   meta: {
-//     hideInBread: true
-//   },
-//   children: [{
-//     path: 'progress_page',
-//     name: 'progress_page',
-//     meta: {
-//       icon: 'md-notifications',
-//       title: '项目进度'
-//     },
-//     component: () =>
-//       import('@/view/progress/index.vue')
-//   }]
-// },
+{
+  path: '/progress',
+  name: 'progress',
+  component: Main,
+  meta: {
+    hideInBread: true
+  },
+  children: [{
+    path: 'progress_page',
+    name: 'progress_page',
+    meta: {
+      icon: 'md-notifications',
+      title: '项目进度'
+    },
+    component: () =>
+      import('@/view/progress/index.vue')
+  }]
+},
 {
   path: '',
   name: 'doc',
@@ -96,6 +96,78 @@ export default [
     href: 'http://jiahaopan.gitee.io/pjhjiahao1.github.io',
     icon: 'ios-book'
   }
+},
+{
+  path: '/components',
+  name: 'components',
+  meta: {
+    access: ['components'],
+    icon: 'logo-buffer',
+    title: '组件'
+  },
+  component: Main,
+  children: [
+    {
+      path: 'drag_drawer_page',
+      name: 'drag_drawer_page',
+      meta: {
+        icon: 'md-list',
+        title: '可拖拽抽屉'
+      },
+      component: () =>
+        import ('@/view/components/drag-drawer')
+    },
+    {
+      path: 'tree_table_page',
+      name: 'tree_table_page',
+      meta: {
+        icon: 'md-git-branch',
+        title: '树状表格'
+      },
+      component: () =>
+        import ('@/view/components/tree-table/index.vue')
+    },
+    {
+      path: 'cropper_page',
+      name: 'cropper_page',
+      meta: {
+        icon: 'md-crop',
+        title: '图片裁剪'
+      },
+      component: () =>
+        import ('@/view/components/cropper/cropper.vue')
+    },
+    {
+      path: 'split_pane_page',
+      name: 'split_pane_page',
+      meta: {
+        icon: 'md-pause',
+        title: '分割窗口'
+      },
+      component: () =>
+        import ('@/view/components/split-pane/split-pane.vue')
+    },
+    {
+      path: 'markdown_page',
+      name: 'markdown_page',
+      meta: {
+        icon: 'logo-markdown',
+        title: 'Markdown编辑器'
+      },
+      component: () =>
+        import ('@/view/components/markdown/markdown.vue')
+    },
+    {
+      path: 'editor_page',
+      name: 'editor_page',
+      meta: {
+        icon: 'ios-create',
+        title: '富文本编辑器'
+      },
+      component: () =>
+        import ('@/view/components/editor/editor.vue')
+    }
+  ]
 },
 {
   path: '/401',

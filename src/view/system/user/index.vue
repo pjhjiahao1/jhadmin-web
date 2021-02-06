@@ -217,66 +217,7 @@ export default {
               span: 8,
               itemRender: {
                 name: "$input",
-                props: { placeholder: "请输入邮件" }
-              }
-            },
-            {
-              field: "roleName",
-              title: "角色",
-              span: 8,
-              itemRender: {
-                name: "$input",
                 props: { placeholder: "请输入昵称" }
-              }
-            },
-            {
-              field: "gender",
-              title: "性别",
-              span: 8,
-              folding: true,
-              itemRender: {
-                name: "$input",
-                props: { placeholder: "请输入角色" }
-              }
-            },
-            {
-              field: "enabled",
-              title: "状态",
-              span: 8,
-              folding: true,
-              itemRender: {
-                name: "$input",
-                props: { placeholder: "请输入角色" }
-              }
-            },
-            {
-              field: "phone",
-              title: "手机号",
-              span: 8,
-              folding: true,
-              itemRender: {
-                name: "$input",
-                props: { placeholder: "请输入年龄" }
-              }
-            },
-            {
-              field: "email",
-              title: "邮箱",
-              span: 8,
-              folding: true,
-              itemRender: {
-                name: "$input",
-                props: { placeholder: "请输入年龄" }
-              }
-            },
-            {
-              field: "createTime",
-              title: "创建日期",
-              span: 8,
-              folding: true,
-              itemRender: {
-                name: "$input",
-                props: { placeholder: "请输入年龄" }
               }
             },
             {
