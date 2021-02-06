@@ -21,7 +21,7 @@
       <p slot="title">状态</p>
       <div>
         <row type="flex" justify="space-around" class="code-row-bg">
-          <i-col span="4">
+          <i-col span="8">
             <Tooltip placement="top">
               <div slot="content" style="font-size: 12px;">
                 <div style="padding: 3px;">{{ cpu.name }}</div>
@@ -48,7 +48,7 @@
               </i-circle>
             </Tooltip>
           </i-col>
-          <i-col span="4">
+          <i-col span="8">
             <Tooltip placement="top">
               <div slot="content" style="font-size: 12px;">
                 <div style="padding: 3px;">总量：{{ memory.total }}</div>
@@ -74,33 +74,7 @@
               </i-circle>
             </Tooltip>
           </i-col>
-          <i-col span="4">
-            <Tooltip placement="top">
-              <div slot="content" style="font-size: 12px;">
-                <div style="padding: 3px;">总量：{{ swap.total }}</div>
-                <div style="padding: 3px">已使用：{{ swap.used }}</div>
-                <div style="padding: 3px">空闲：{{ swap.available }}</div>
-              </div>
-              <i-circle
-                :percent="parseFloat(swap.usageRate)"
-                dashboard
-                :size="170"
-                :trail-width="4"
-                :stroke-width="5"
-                stroke-linecap="square"
-                stroke-color="#43a3fb"
-              >
-                <div class="demo-Circle-custom">
-                  <h3>交换区使用率</h3>
-                  <p>{{parseFloat(swap.usageRate == undefined || swap.usageRate == null || swap.usageRate == ''? 0: swap.usageRate)}}%</p>
-                  <span>
-                    <i>{{ swap.used }} / {{ swap.total }}</i>
-                  </span>
-                </div>
-              </i-circle>
-            </Tooltip>
-          </i-col>
-          <i-col span="4">
+          <i-col span="8">
             <Tooltip placement="top">
               <div slot="content" style="font-size: 12px;">
                 <div style="padding: 3px">总量：{{ disk.total }}</div>
