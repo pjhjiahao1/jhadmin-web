@@ -36,10 +36,11 @@
             <RadioGroup v-model="menu.isLeaf" type="button" @on-change="redioChange">
               <Radio label="0">目录</Radio>
               <Radio label="1">菜单</Radio>
+              <Radio label="2">按钮</Radio>
             </RadioGroup>
           </FormItem>
         </Row>
-        <Row>
+        <Row v-if="!buttonCol">
           <FormItem label="菜单图标：">
             <icon-choose v-model="menu.icon" placeholder="选择图标，子菜单非必选"></icon-choose>
           </FormItem>
@@ -47,44 +48,62 @@
         <Row>
           <i-col span="12">
             <FormItem prop="menuName" label="菜单标题：">
-              <Input placeholder="菜单标题" v-model="menu.menuName" />
+              <Input placeholder="名称" v-model="menu.menuName" />
             </FormItem>
           </i-col>
           <i-col span="12">
-            <FormItem label="菜单排序：" prop="sort">
+            <FormItem label="排序：" prop="sort">
               <Input placeholder="请输入" v-model="menu.sort" />
             </FormItem>
           </i-col>
         </Row>
         <Row>
-          <i-col span="12" v-if="showCol == true">
+          <i-col span="12" v-if="showCol">
             <FormItem label="路由地址：" prop="component">
               <Input placeholder="前端页面路径: system/dept/index" v-model="menu.component" />
             </FormItem>
           </i-col>
-          <i-col span="12" v-if="showCol == true">
+          <i-col span="12" v-if="showCol || buttonCol">
             <FormItem label="权限标识：" prop="permission">
               <Input placeholder="权限标识: dept:list" v-model="menu.permission" />
             </FormItem>
           </i-col>
         </Row>
         <Row>
-          <i-col span="12">
+          <i-col span="12" v-if="!buttonCol">
             <FormItem label="组件名称：" prop="menuCode">
               <Input placeholder="页面name: system_dept;目录：system" v-model="menu.menuCode" />
             </FormItem>
           </i-col>
-          <i-col span="12" v-if="showCol == true">
+          <i-col span="12" v-if="showCol || buttonCol">
             <FormItem label="上级名称：" prop="menuPid">
-              <!-- <Input placeholder="上级名称" v-model="menu.menuPid"/> -->
-              <Select v-model="menu.menuPid" filterable>
+              <!-- <Select v-model="menu.menuPid" filterable>
                 <Option
                   v-for="item in firstMenuData"
                   :value="item.id"
                   :key="item.id"
                 >{{ item.menuName }}</Option>
-              </Select>
+              </Select> -->
+              <Dropdown trigger="custom" :visible="visible">
+            <Input
+              v-model="menu.menuPidName"
+              readonly
+              icon="ios-clock-outline"
+              style="width: 240px"
+              @on-click="handleOpen"
+            />
+            <DropdownMenu slot="list">
+              <div style="width: 240px"></div>
+              <div>
+                <Tree :data="treeData" @on-select-change="getClickTree" :load-data="loadData"></Tree>
+                <div style="text-align: right;margin:10px;">
+                  <Button type="primary" @click="handleClose">关闭</Button>
+                </div>
+              </div>
+            </DropdownMenu>
+          </Dropdown>
             </FormItem>
+            
           </i-col>
         </Row>
         <Row type="flex" justify="end" class="code-row-bg">
@@ -99,7 +118,7 @@
 </template>
 
 <script>
-import { list, firstMenu, save, update, remove } from "@/api/system/menu";
+import { list, firstMenu, save, update, remove, getTreeData } from "@/api/system/menu";
 import IconChoose from "@/components/icons-choose/icon-choose";
 import { Notice } from "iview";
 import { validateNumber } from "@/libs/validate"; // 正数验证
@@ -126,6 +145,7 @@ export default {
         sort: "",
         menuCode: "",
         menuPid: "",
+        menuPidName: "",
         level: 1 // 1: 目录 2: 菜单 3: 按钮
       },
       tableProxy: {
@@ -216,11 +236,35 @@ export default {
       show: false,
       title: "",
       showCol: false,
-      firstMenuData: ""
+      buttonCol: false,
+      firstMenuData: "",
+      visible: false,
+      treeData: [],
     };
   },
   async created() {},
   methods: {
+    getTreeData(val) {
+      getTreeData({ pid: val }).then(res => {
+        this.treeData = res.data.data;
+      }).catch((e) => {});
+    },
+    getClickTree(row) {
+      this.visible = false
+      this.menu.menuPidName = row[0].title
+      this.menu.menuPid = row[0].id
+    },
+    handleClose() {
+      this.visible = false;
+    },
+    loadData(item, callback) {
+      getTreeData({ pid: item.id }).then(res => {
+        callback(res.data.data);
+      });
+    },
+    handleOpen() {
+      this.visible = true;
+    },
     ok() {
       this.$refs.menuForm.validate(async valid => {
         if (valid) {
@@ -257,12 +301,19 @@ export default {
       }).catch((e) => {});;
     },
     redioChange(value) {
+      this.visible = false
       if (value == 1) {
+        this.buttonCol = false
         this.showCol = true;
         this.menu.level = 2;
-      } else {
+      } else if (value == 0){
+        this.buttonCol = false
         this.showCol = false;
         this.menu.level = 1;
+      } else {
+        this.showCol = false
+        this.buttonCol = true
+        this.menu.level = 3
       }
     },
     find(val) {
@@ -323,7 +374,7 @@ export default {
     }
   },
   mounted() {
-    this.getFirstMenu();
+    this.getTreeData(0)
   }
 };
 </script>

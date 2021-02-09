@@ -10,8 +10,8 @@
         <Card>
           <vxe-grid ref="xGrid" v-bind="gridOptions" :toolbar-config="tableToolbar">
             <template v-slot:toolbar_buttons>
-              <vxe-button status="primary" @click="add">新增</vxe-button>
-              <vxe-button status="success" @click="edit">编辑</vxe-button>
+              <vxe-button status="primary" @click="add" v-if="accessAdd">新增</vxe-button>
+              <vxe-button status="success" @click="edit" v-if="accessEdit">编辑</vxe-button>
               <vxe-button status="danger" @click="remove">删除</vxe-button>
               <vxe-button status="warning" @click="exportExcel">导出</vxe-button>
             </template>
@@ -153,6 +153,7 @@ import { getAllRole } from "@/api/system/role";
 import { validateTel, validateEmail } from "@/libs/validate"; // 手机号验证
 import { downloadFile } from "@/api/downUtils";
 import { Notice } from "iview";
+import { hasOneOf } from '@/libs/tools'
 let windowHeight = document.documentElement.clientHeight - 150;
 export default {
   name: "system_user",
@@ -396,7 +397,7 @@ export default {
     this.getHeight();
     this.roleList = (await getAllRole()).data.data || []; // 角色列表下拉select框
     this.getTreeData(0);
-    this.job = (await findAll()).data.data || [];
+    this.job = (await findAll()).data.data || [];    
   },
   destroyed() {
     window.removeEventListener("resize", this.getHeight);
@@ -551,7 +552,17 @@ export default {
       });
     }
   },
-  mounted() {}
+  computed: {
+    accessAdd () {
+      return hasOneOf(['user:add'], this.access)
+    },
+    accessEdit () {
+      return hasOneOf(['user:edit'], this.access)
+    },
+    access () {
+      return this.$store.state.user.access
+    }
+  }
 };
 </script>
 

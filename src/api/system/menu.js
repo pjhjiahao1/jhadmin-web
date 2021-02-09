@@ -21,12 +21,15 @@ export const list = (params) => {
   })
 }
 
-export const firstMenu = () => {
+export const getTreeData = (params) => {
   return axios.request({
-    url: 'api/menus/firstMenu',
+    url: 'api/menus/getTreeData',
+    params,
     method: 'get'
   })
 }
+
+
 
 export const save = (params) => {
   return axios.request({
